@@ -2,23 +2,12 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { MessageCircle, Search, Phone, Video, Send } from 'lucide-react'
+import { MessageCircle, Search, Phone, Video, Send, Loader2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import CallButton from "@/components/CallButton"
+import { useRealtimeChat } from '@/hooks/useRealtimeChat'
 import Image from 'next/image'
-
-interface Message {
-  id: string
-  text: string
-  createdAt: string
-  senderId: string
-  sender: {
-    name: string
-    image: string
-  }
-}
 
 interface ChatUser {
   id: string
@@ -32,13 +21,19 @@ interface ChatUser {
 export default function MessagesPage() {
   const { data: session } = useSession()
   const [activeChat, setActiveChat] = useState<ChatUser | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([])
   const [loading, setLoading] = useState(true)
+  const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout>()
 
   const currentUserId = session?.user?.id
+
+  const { messages, isConnected, typingUsers, sendMessage, setTyping } = useRealtimeChat(
+    currentUserId || '',
+    activeChat?.id || ''
+  )
 
   if (!session) return <div className="flex items-center justify-center min-h-screen text-muted-foreground">Sign in to view messages</div>
 
@@ -47,21 +42,11 @@ export default function MessagesPage() {
   }, [])
 
   useEffect(() => {
-    if (activeChat) {
-      fetchMessages()
-      const interval = setInterval(fetchMessages, 3000) // Poll every 3s for RT
-      return () => clearInterval(interval)
-    }
-  }, [activeChat])
-
-  useEffect(() => {
     scrollToBottom()
   }, [messages])
 
   const fetchChatUsers = async () => {
-    // Fetch users you've messaged
-    const res = await fetch(`/api/messages?userId=${currentUserId}&limit=20`)
-    // Simulate/group by other user
+    // TODO: Fetch real chat users from API
     setChatUsers([
       {
         id: 'user1',
@@ -79,34 +64,33 @@ export default function MessagesPage() {
         lastMessage: 'Thanks for the follow!',
         updatedAt: '1h ago'
       }
-      // TODO: Real fetch distinct users from messages
     ])
     setLoading(false)
   }
 
-  const fetchMessages = async () => {
-    if (!activeChat || !currentUserId) return
-    const res = await fetch(`/api/messages?userId=${currentUserId}&otherUserId=${activeChat.id}`)
-    if (res.ok) {
-      const data = await res.json()
-      setMessages(data)
-    }
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newMessage.trim() || !activeChat || !currentUserId) return
+
+    await sendMessage(newMessage, session.user?.name, session.user?.image)
+    setNewMessage('')
+    setIsTyping(false)
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
   }
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newMessage.trim() || !activeChat) return
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value)
 
-    const res = await fetch(`/api/messages?userId=${currentUserId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: newMessage.trim(), receiverId: activeChat.id })
-    })
-
-    if (res.ok) {
-      setNewMessage('')
-      fetchMessages()
+    if (!isTyping) {
+      setIsTyping(true)
+      setTyping(true)
     }
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false)
+      setTyping(false)
+    }, 3000)
   }
 
   const scrollToBottom = () => {
@@ -178,11 +162,17 @@ export default function MessagesPage() {
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold">{activeChat.name}</p>
-                  <p className="text-sm text-muted-foreground">@ {activeChat.username}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {isConnected ? '🟢 متصل' : '⚪ غير متصل'}
+                  </p>
                 </div>
                 <div className="flex gap-1">
-                  <CallButton otherUserId={activeChat.id} type="voice" className="hover:bg-green-500/10 h-12 w-12 p-3 rounded-xl group-hover:text-green-600 border border-green-200/50" />
-                  <CallButton otherUserId={activeChat.id} type="video" className="hover:bg-purple-500/10 h-12 w-12 p-3 rounded-xl group-hover:text-purple-600 border border-purple-200/50" />
+                  <Button size="icon" variant="ghost" className="hover:bg-green-500/10">
+                    <Phone className="h-5 w-5 text-green-600" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="hover:bg-purple-500/10">
+                    <Video className="h-5 w-5 text-purple-600" />
+                  </Button>
                 </div>
               </div>
 
@@ -210,21 +200,44 @@ export default function MessagesPage() {
                     </div>
                   ))
                 )}
+
+                {/* Typing Indicator */}
+                {typingUsers.size > 0 && (
+                  <div className="flex justify-start">
+                    <div className="bg-white border rounded-2xl p-3 shadow-sm">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div ref={messagesEndRef} />
               </div>
 
               {/* Input */}
-              <form onSubmit={sendMessage} className="border-t bg-white/80 backdrop-blur p-4 sticky bottom-0">
+              <form onSubmit={handleSendMessage} className="border-t bg-white/80 backdrop-blur p-4 sticky bottom-0">
                 <div className="flex items-end gap-2">
                   <Input
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={handleInputChange}
                     placeholder="Type a message..."
                     className="flex-1 min-h-[44px] resize-none"
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(e as any)}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage(e as any)}
                   />
-                  <Button type="submit" size="icon" className="h-12 w-12 shrink-0 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-lg">
-                    <Send className="h-5 w-5" />
+                  <Button 
+                    type="submit" 
+                    size="icon" 
+                    disabled={!isConnected}
+                    className="h-12 w-12 shrink-0 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-lg disabled:opacity-50"
+                  >
+                    {isConnected ? (
+                      <Send className="h-5 w-5" />
+                    ) : (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    )}
                   </Button>
                 </div>
               </form>

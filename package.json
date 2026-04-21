@@ -22,6 +22,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^5.14.0",
     "@radix-ui/react-slot": "^1.2.4",
+    "@supabase/supabase-js": "^2.104.0",
     "@tanstack/react-query": "^5.99.2",
     "@tanstack/react-query-devtools": "^5.99.2",
     "argon2": "^0.44.0",
@@ -33,7 +34,10 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.73.1",
+    "simple-peer": "^9.11.1",
+    "socket.io-client": "^4.8.3",
     "tailwind-merge": "^3.5.0",
+    "web-push": "^3.6.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -41,6 +45,8 @@
     "@types/nodemailer": "^6.4.14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/simple-peer": "^9.11.9",
+    "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.5.0",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.4",
