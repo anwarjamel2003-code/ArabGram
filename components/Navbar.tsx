@@ -2,89 +2,170 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, MessageCircle, Heart, LogOut } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Search, MessageCircle, Bell, LogOut, Home, Compass, PlusSquare, User } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
+import { useState } from 'react'
 
 export default function Navbar() {
   const { data: session } = useSession()
+  const [notifCount] = useState(3)
 
   return (
-    <>
-      <nav className="border-b border-gray-200/50 dark:border-gray-800/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center px-4 lg:px-6">
-          <Link href="/" className="flex items-center space-x-2 font-black text-3xl hover:scale-105 transition-all duration-300 mr-8">
-            <Image 
-              src="/arabgram-logo.png" 
-              alt="ArabGram Logo" 
-              width={50} 
-              height={50}
-              className="h-12 w-12 object-contain"
-              priority
-            />
-            <span className="arabgram-text-gradient">Arabgram</span>
+    <nav className="border-b border-white/10 bg-black/40 backdrop-blur-2xl shadow-lg sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link
+            href={session ? '/feed' : '/'}
+            className="flex items-center gap-2 group"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 arabgram-gradient rounded-xl blur opacity-0 group-hover:opacity-60 transition-opacity duration-300" />
+              <Image
+                src="/arabgram-logo.png"
+                alt="ArabGram"
+                width={40}
+                height={40}
+                className="relative rounded-xl object-contain transition-transform duration-300 group-hover:scale-110"
+                priority
+              />
+            </div>
+            <span className="text-xl font-black arabgram-text-gradient hidden sm:block">
+              ArabGram
+            </span>
           </Link>
-          <div className="flex flex-1 items-center justify-end space-x-1 lg:space-x-3">
-            <Button variant="ghost" size="icon" asChild className="hover:bg-indigo-500/10 hover:scale-110 transition-all duration-300 group">
-              <Link href="/search">
-                <Search className="h-6 w-6 group-hover:text-indigo-600 transition-colors duration-300" />
-              </Link>
-            </Button>
-            {session && (
+
+          {/* Center Nav (Desktop) */}
+          {session && (
+            <div className="hidden md:flex items-center gap-1">
+              <NavItem href="/feed" icon={Home} label="الرئيسية" />
+              <NavItem href="/search" icon={Compass} label="استكشاف" />
+              <NavItem href="/stories" icon={PlusSquare} label="القصص" />
+            </div>
+          )}
+
+          {/* Right Actions */}
+          <div className="flex items-center gap-1">
+            {session ? (
               <>
-                <Button variant="ghost" size="icon" asChild className="hover:bg-pink-500/10 hover:scale-110 transition-all duration-300 group">
-                  <Link href="/messages">
-                    <MessageCircle className="h-6 w-6 group-hover:text-pink-600 transition-colors duration-300" />
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="icon" asChild className="hover:bg-rose-500/10 hover:scale-110 transition-all duration-300 group relative">
-                  <Link href="/notifications">
-                    <Heart className="h-6 w-6 group-hover:text-rose-600 transition-colors duration-300" />
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="icon" asChild className="w-12 h-12 hover:scale-110 transition-all duration-300 hover:shadow-lg">
-                  <Link href="/profile">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold">AG</AvatarFallback>
-                    </Avatar>
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => signOut()} 
-                  className="hover:bg-red-500/10 hover:scale-110 transition-all duration-300 group"
-                  title="Sign Out"
+                {/* Search */}
+                <Link
+                  href="/search"
+                  className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+                  title="البحث"
                 >
-                  <LogOut className="h-6 w-6 group-hover:text-red-600 transition-colors duration-300" />
-                </Button>
+                  <Search className="h-5 w-5" />
+                </Link>
+
+                {/* Messages */}
+                <Link
+                  href="/messages"
+                  className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+                  title="الرسائل"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                </Link>
+
+                {/* Notifications */}
+                <Link
+                  href="/notifications"
+                  className="relative p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200"
+                  title="الإشعارات"
+                >
+                  <Bell className="h-5 w-5" />
+                  {notifCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {notifCount}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Profile */}
+                <Link
+                  href="/profile"
+                  className="p-1 rounded-xl hover:bg-white/10 transition-all duration-200"
+                  title="الملف الشخصي"
+                >
+                  <div className="w-8 h-8 arabgram-gradient rounded-xl flex items-center justify-center">
+                    {session.user?.image ? (
+                      <Image
+                        src={session.user.image}
+                        alt="Profile"
+                        width={32}
+                        height={32}
+                        className="rounded-xl object-cover"
+                      />
+                    ) : (
+                      <User className="h-4 w-4 text-white" />
+                    )}
+                  </div>
+                </Link>
+
+                {/* Sign Out */}
+                <button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="p-2 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+                  title="تسجيل الخروج"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
               </>
-            )}
-            {!session && (
-              <div className="flex items-center space-x-2">
-                <Button 
-                  variant="outline"
-                  asChild
-                  className="border-indigo-500/50 text-indigo-400 hover:bg-indigo-500/10"
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/auth/signin"
+                  className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white border border-white/20 rounded-xl hover:bg-white/10 transition-all duration-300"
                 >
-                  <Link href="/auth/signin">
-                    Sign In
-                  </Link>
-                </Button>
-                <Button 
-                  asChild
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold"
+                  دخول
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="px-4 py-2 text-sm font-semibold text-white btn-arabgram rounded-xl"
                 >
-                  <Link href="/auth/signup">
-                    Sign Up
-                  </Link>
-                </Button>
+                  تسجيل
+                </Link>
               </div>
             )}
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+
+      {/* Mobile Bottom Nav */}
+      {session && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/80 backdrop-blur-2xl">
+          <div className="flex items-center justify-around py-2 px-4">
+            <MobileNavItem href="/feed" icon={Home} label="الرئيسية" />
+            <MobileNavItem href="/search" icon={Search} label="بحث" />
+            <MobileNavItem href="/stories" icon={PlusSquare} label="قصص" />
+            <MobileNavItem href="/messages" icon={MessageCircle} label="رسائل" />
+            <MobileNavItem href="/profile" icon={User} label="حسابي" />
+          </div>
+        </div>
+      )}
+    </nav>
+  )
+}
+
+function NavItem({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
+    >
+      <Icon className="h-5 w-5" />
+      <span>{label}</span>
+    </Link>
+  )
+}
+
+function MobileNavItem({ href, icon: Icon, label }: { href: string; icon: any; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-gray-400 hover:text-white transition-all duration-200"
+    >
+      <Icon className="h-5 w-5" />
+      <span className="text-[10px]">{label}</span>
+    </Link>
   )
 }
