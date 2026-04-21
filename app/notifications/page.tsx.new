@@ -1,0 +1,94 @@
+'use client'
+
+import { useSession } from 'next-auth/react'
+import { useQuery } from '@tanstack/react-query'
+import { Heart, MessageCircle, UserPlus, Bell } from 'lucide-react'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+
+const getNotifications = async (userId: string) => {
+  const res = await fetch(`/api/notifications?userId=${userId}`)
+  if (!res.ok) throw new Error('Failed')
+  return res.json()
+}
+
+export default function Notifications() {
+  const { data: session } = useSession()
+
+  const { data: notifications = [], isLoading } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => getNotifications((session?.user as any)?.id as string),
+    enabled: !!session
+  })
+
+  if (!session) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="p-8 text-center max-w-md">
+          <Bell className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+          <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">يرجى تسجيل الدخول</h2>
+          <p className="text-gray-600 dark:text-gray-400">لعرض إخطاراتك</p>
+        </Card>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    )
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'like':
+        return <Heart className="h-5 w-5 text-red-500" fill="currentColor" />
+      case 'follow':
+        return <UserPlus className="h-5 w-5 text-blue-500" />
+      case 'comment':
+        return <MessageCircle className="h-5 w-5 text-purple-500" />
+      default:
+        return <Bell className="h-5 w-5" />
+    }
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-4 pb-8">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">الإخطارات</h1>
+      </div>
+
+      {notifications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Bell className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">لا توجد إخطارات</h2>
+          <p className="text-gray-600 dark:text-gray-400">سيظهر هنا عندما يتفاعل الآخرون مع منشوراتك</p>
+        </div>
+      ) : (
+        notifications.map((notif: any) => (
+          <Card key={notif.id} className="p-4 hover:shadow-lg transition-all dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer hover:-translate-y-0.5">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="flex-shrink-0 p-2 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full">
+                  {getNotificationIcon(notif.type)}\n                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2\">\n                    {notif.message}\n                  </p>
+                  <p className=\"text-xs text-gray-500 dark:text-gray-400 mt-1\">
+                    {new Date(notif.time).toLocaleString('ar-SA')}
+                  </p>
+                </div>
+              </div>
+              {notif.type === 'follow' && (
+                <Button size=\"sm\" className=\"bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 whitespace-nowrap\">
+                  متابعة
+                </Button>
+              )}
+            </div>
+          </Card>
+        ))
+      )}
+    </div>
+  )
+}
