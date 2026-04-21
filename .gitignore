@@ -35,7 +35,42 @@ yarn-error.log*
 
 # prisma
 /prisma/migrations
+prisma/dev.db
+prisma/dev.db-journal
 
 # types
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+.eslintcache
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+dist/
+build/
+
+# Package manager
+pnpm-lock.yaml
