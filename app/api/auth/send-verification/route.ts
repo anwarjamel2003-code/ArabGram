@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
+import { hashPassword } from '@/lib/security'
 import { z } from 'zod'
 import { generateVerificationCode, sendVerificationEmail } from '@/lib/email'
 
@@ -32,11 +32,13 @@ export async function POST(request: NextRequest) {
 
     // Generate verification code
     const verificationCode = generateVerificationCode()
-    const hashedCode = await bcrypt.hash(verificationCode, 10)
+    // In production, we'd hash this, but for now we follow the existing flow or security lib
+    // The previous code used bcrypt for verificationCode too, we'll use hashPassword from lib/security
+    const hashedCode = await hashPassword(verificationCode)
     const codeExpiry = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12)
+    // Hash password using argon2 via lib/security
+    const hashedPassword = await hashPassword(password)
 
     // Create temporary user record with pending verification
     await prisma.user.create({
@@ -51,10 +53,6 @@ export async function POST(request: NextRequest) {
         bio: null,
       },
     })
-
-    // Store verification code in a temporary way (in production, use a separate table)
-    // For now, we'll store it in environment or cache
-    // In production, create a VerificationCode table in Prisma schema
 
     // Send verification email
     const emailSent = await sendVerificationEmail(email, verificationCode, name)
@@ -78,8 +76,6 @@ export async function POST(request: NextRequest) {
       {
         message: 'تم إرسال رمز التحقق بنجاح',
         maskedEmail,
-        // Store code in session/cache for verification (in production)
-        // For demo purposes, we're sending it via email
       },
       { status: 200 }
     )
