@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
 
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
-  let users
+  let users: any[] = []
   if (type === 'followers') {
-    users = await prisma.user.findUnique({
+    const result = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         followers: {
@@ -24,10 +24,10 @@ export async function GET(request: NextRequest) {
           include: { follower: { select: { id: true, name: true, username: true, image: true } } }
         }
       }
-    })?.followers || []
-    users = users.map(f => f.follower)
+    })
+    users = (result?.followers || []).map((f: any) => f.follower)
   } else if (type === 'following') {
-    users = await prisma.user.findUnique({
+    const result = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         following: {
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
           include: { following: { select: { id: true, name: true, username: true, image: true } } }
         }
       }
-    })?.following || []
-    users = users.map(f => f.following)
+    })
+    users = (result?.following || []).map((f: any) => f.following)
   } else {
     return NextResponse.json({ error: 'type must be followers or following' }, { status: 400 })
   }

@@ -78,6 +78,10 @@ export async function GET(request: NextRequest) {
   const otherUserId = searchParams.get('otherUserId')
   const limit = parseInt(searchParams.get('limit') || '20')
 
+  if (!otherUserId) {
+    return NextResponse.json({ error: 'otherUserId required' }, { status: 400 })
+  }
+
   try {
     const calls = await prisma.call.findMany({
       where: {
