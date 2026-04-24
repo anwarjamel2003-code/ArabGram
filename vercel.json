@@ -73,7 +73,7 @@
       "type": "plain"
     }
   ],
-  "buildOutputDirectory": ".next",
+
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 60,
