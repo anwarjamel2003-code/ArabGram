@@ -1,7 +1,7 @@
 'use client'
 
 import { Input } from "@/components/ui/input"
-import { Search, User, Hash, Image as ImageIcon, Loader } from "lucide-react"
+import { Search, User, Hash, ImageIcon as ImageIconComponent, Loader } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -14,7 +14,7 @@ export default function SearchPage() {
   const tabs = [
     { id: 'users', icon: User, label: 'Users' },
     { id: 'posts', icon: Hash, label: 'Posts' },
-    { id: 'stories', icon: Image, label: 'Stories' }
+    { id: 'stories', icon: ImageIconComponent, label: 'Stories' }
   ]
 
   return (
@@ -34,7 +34,7 @@ export default function SearchPage() {
         {/* Tabs */}
         <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-1 shadow-xl mb-8">
           <div className="flex gap-1">
-            {tabs.map(({ id, icon: Icon, label }) => (
+            {tabs.map(({ id, icon: Icon, label }: any) => (
               <Button
                 key={id}
                 variant={tab === id ? 'default' : 'ghost'}

@@ -41,11 +41,11 @@ export function useRealtimeChat(userId: string, otherUserId: string) {
     })
 
     channel
-      .on('broadcast', { event: 'message' }, (payload) => {
+      .on('broadcast', { event: 'message' }, (payload: any) => {
         console.log('[CHAT] Received message:', payload.payload)
         setMessages((prev) => [...prev, payload.payload])
       })
-      .on('broadcast', { event: 'typing' }, (payload) => {
+      .on('broadcast', { event: 'typing' }, (payload: any) => {
         const { userId: typingUserId, isTyping } = payload.payload
         setTypingUsers((prev) => {
           const newSet = new Set(prev)
@@ -57,7 +57,7 @@ export function useRealtimeChat(userId: string, otherUserId: string) {
           return newSet
         })
       })
-      .subscribe((status) => {
+      .subscribe((status: any) => {
         console.log('[CHAT] Status:', status)
         setIsConnected(status === 'SUBSCRIBED')
       })

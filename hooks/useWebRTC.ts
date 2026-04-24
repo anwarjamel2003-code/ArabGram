@@ -31,7 +31,7 @@ export function useWebRTC(config: WebRTCConfig) {
     try {
       const peer = new SimplePeer({
         initiator: config.initiator,
-        trickleIce: true,
+        trickle: true,
         stream: config.stream,
         config: {
           iceServers: [

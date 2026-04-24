@@ -31,11 +31,11 @@ export function useWebRTCSignaling(callId: string, userId: string) {
     })
 
     channel
-      .on('broadcast', { event: 'signal' }, (payload) => {
+      .on('broadcast', { event: 'signal' }, (payload: any) => {
         console.log('[SIGNALING] Received:', payload.payload)
         setSignals((prev) => [...prev, payload.payload])
       })
-      .subscribe((status) => {
+      .subscribe((status: any) => {
         console.log('[SIGNALING] Status:', status)
         setIsConnected(status === 'SUBSCRIBED')
       })

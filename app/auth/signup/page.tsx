@@ -52,10 +52,10 @@ export default function Signup() {
   const currentStep = steps[step - 1]
 
   const validateStep = () => {
-    const field = currentStep.field
+    const field = currentStep.field as any
     if (field === 'verification') return true
     
-    const partial = { [field]: formData[field] }
+    const partial = { [field]: (formData as any)[field] }
     const partialSchema = schema.pick({ [field]: true } as any)
     const result = partialSchema.safeParse(partial)
 

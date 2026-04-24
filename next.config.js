@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  compress: true,
   poweredByHeader: false,
   generateEtags: true,
   
@@ -96,56 +93,30 @@ const nextConfig = {
     NEXT_PUBLIC_APP_VERSION: '1.0.0',
   },
 
-  // Webpack configuration
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Vendor chunk
-            vendor: {
-              filename: 'chunks/vendor.js',
-              chunks: 'all',
-              test: /node_modules/,
-              priority: 20,
-            },
-            // Common chunk
-            common: {
-              minChunks: 2,
-              priority: 10,
-              reuseExistingChunk: true,
-              filename: 'chunks/common.js',
-            },
-          },
-        },
-      }
-    }
-    return config
+  // Turbopack configuration (Next.js 16)
+  turbopack: {
+    resolveAlias: {
+      '@/components/ui/dialog': '@/components/ui/dialog',
+    },
   },
+
+  // Server external packages
+  serverExternalPackages: ['simple-peer', 'web-push', 'argon2'],
 
   // Experimental features
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
 
-  // Production source maps (optional, disable for smaller bundle)
+  // Production source maps (disable for smaller bundle and faster builds)
   productionBrowserSourceMaps: false,
 
   // Trailing slash
   trailingSlash: false,
 
-  // Strict mode
-  reactStrictMode: true,
-
-  // SWC minification
-  swcMinify: true,
-
   // Compression
   compress: true,
 }
 
+// Export configuration
 module.exports = nextConfig

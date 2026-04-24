@@ -33,7 +33,7 @@ export function useNotifications() {
   }
 
   const subscribe = useCallback(async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !session?.user?.id || !VAPID_PUBLIC_KEY) {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !(session?.user as any)?.id || !VAPID_PUBLIC_KEY) {
       return
     }
 
@@ -76,7 +76,7 @@ export function useNotifications() {
     } finally {
       setLoading(false)
     }
-  }, [session?.user?.id])
+  }, [(session?.user as any)?.id])
 
   return {
     permission,

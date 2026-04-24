@@ -1,96 +1,109 @@
 'use client'
 
 import { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog" // Assume shadcn dialog exists, else use Modal
-import { Edit3, X } from "lucide-react"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Edit2, X } from 'lucide-react'
 
 interface EditProfileModalProps {
-  user: any
-  onUpdate: () => void
+  user: {
+    name?: string
+    bio?: string
+    image?: string
+  }
+  onSave?: (data: any) => Promise<void>
+  onUpdate?: () => Promise<void>
 }
 
-export default function EditProfileModal({ user, onUpdate }: EditProfileModalProps) {
+export default function EditProfileModal({ user, onSave }: EditProfileModalProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: user.name || '',
     bio: user.bio || '',
-    image: user.image || ''
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSave = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
-      if (res.ok) {
-        onUpdate()
-        setOpen(false)
+      if (onSave) {
+        await onSave(formData)
       }
+      setOpen(false)
     } catch (error) {
-      console.error('Update failed', error)
+      console.error('Error saving profile:', error)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
-          <Edit3 className="h-4 w-4" />
-          Edit Profile
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
-          <DialogDescription>Update your profile information</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">Name</label>
-            <Input 
-              value={formData.name} 
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              placeholder="Enter name"
-            />
+    <>
+      <Button variant="outline" size="sm" className="gap-2" onClick={() => setOpen(true)}>
+        <Edit2 className="h-4 w-4" />
+        تعديل الملف الشخصي
+      </Button>
+
+      {open && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">تعديل الملف الشخصي</h2>
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <label htmlFor="name" className="text-sm font-medium">
+                  الاسم
+                </label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  placeholder="أدخل اسمك"
+                />
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="bio" className="text-sm font-medium">
+                  السيرة الذاتية
+                </label>
+                <Input
+                  id="bio"
+                  value={formData.bio}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bio: e.target.value })
+                  }
+                  placeholder="أخبرنا عن نفسك"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={loading}
+                className="bg-gradient-to-r from-indigo-500 to-purple-600"
+              >
+                {loading ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+              </Button>
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-medium">Bio</label>
-            <Input 
-              value={formData.bio} 
-              onChange={(e) => setFormData({...formData, bio: e.target.value})}
-              placeholder="Tell us about yourself"
-              maxLength={150}
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium">Profile Image URL</label>
-            <Input 
-              value={formData.image} 
-              onChange={(e) => setFormData({...formData, image: e.target.value})}
-              placeholder="https://image.url"
-            />
-          </div>
-          <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              <X className="mr-2 h-4 w-4" /> Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+      )}
+    </>
   )
 }

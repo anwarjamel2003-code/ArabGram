@@ -26,7 +26,7 @@ export function useRealtime(onEvent: (event: RealtimeEvent) => void) {
   }, [onEvent])
 
   const connect = useCallback(() => {
-    if (!session?.user?.id || eventSourceRef.current) return
+    if (!(session?.user as any)?.id || eventSourceRef.current) return
 
     // Using EventSource for SSE (Server-Sent Events)
     const eventSource = new EventSource('/api/realtime')
@@ -54,7 +54,7 @@ export function useRealtime(onEvent: (event: RealtimeEvent) => void) {
       eventSource.close()
       eventSourceRef.current = null
     }
-  }, [session?.user?.id])
+  }, [(session?.user as any)?.id])
 
   useEffect(() => {
     const cleanup = connect()

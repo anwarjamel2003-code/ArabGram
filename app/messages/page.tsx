@@ -28,7 +28,7 @@ export default function MessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout>()
 
-  const currentUserId = session?.user?.id
+  const currentUserId = (session?.user as any)?.id
 
   const { messages, isConnected, typingUsers, sendMessage, setTyping } = useRealtimeChat(
     currentUserId || '',
@@ -72,7 +72,7 @@ export default function MessagesPage() {
     e.preventDefault()
     if (!newMessage.trim() || !activeChat || !currentUserId) return
 
-    await sendMessage(newMessage, session.user?.name, session.user?.image)
+    await sendMessage(newMessage, (session?.user as any)?.name, (session?.user as any)?.image)
     setNewMessage('')
     setIsTyping(false)
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)

@@ -34,7 +34,7 @@ export default function ProfilePage() {
   const [following, setFollowing] = useState(false)
   const [followersCount, setFollowersCount] = useState(0)
 
-  const currentUserId = session?.user?.id
+  const currentUserId = (session?.user as any)?.id
   const isOwnProfile = profile?.id === currentUserId
   const fullUsername = `@{username}`
 

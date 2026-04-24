@@ -6,16 +6,23 @@ import { createClient } from '@supabase/supabase-js'
  * (Data persistence is still handled by Prisma + PostgreSQL)
  */
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
+// Only create client if both keys are available (for SSR compatibility)
+let supabase: any = null
+
+if (typeof window !== 'undefined' && supabaseUrl && supabaseAnonKey) {
+  supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
     },
-  },
-})
+  })
+}
+
+export { supabase }
 
 // Channel Names
 export const CHANNELS = {

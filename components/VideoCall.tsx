@@ -36,10 +36,10 @@ export default function VideoCall({
 
   const { connected, error, close } = useWebRTC({
     callId,
-    userId: session?.user?.id || '',
+    userId: (session?.user as any)?.id || '',
     otherUserId,
     initiator: false,
-    stream: localStream,
+    stream: localStream || undefined,
     onStream: setRemoteStream,
     onConnect: () => {
       console.log('[CALL] Connected')
