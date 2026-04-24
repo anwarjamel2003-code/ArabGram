@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Eye, EyeOff, Mail, Lock, User, AtSign, ArrowRight, ArrowLeft, Shield, Check, Loader2, AlertCircle } from 'lucide-react'
 import { z } from 'zod'
+import toast from 'react-hot-toast'
 
 const schema = z.object({
   email: z.string().email('بريد إلكتروني غير صالح'),
@@ -46,7 +47,6 @@ export default function Signup() {
   const [verificationCode, setVerificationCode] = useState('')
   const [sentCode, setSentCode] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [serverError, setServerError] = useState('')
   const [resendCountdown, setResendCountdown] = useState(0)
 
   const currentStep = steps[step - 1]
@@ -92,6 +92,7 @@ export default function Signup() {
         if (res.ok) {
           const data = await res.json()
           setSentCode(data.maskedEmail || formData.email)
+          toast.success('تم إرسال رمز التحقق لبريدك')
           setStep(5)
           setResendCountdown(60)
           const interval = setInterval(() => {
@@ -105,10 +106,10 @@ export default function Signup() {
           }, 1000)
         } else {
           const err = await res.json()
-          setServerError(err.message || 'حدث خطأ في إرسال الرمز')
+          toast.error(err.message || 'حدث خطأ في إرسال الرمز')
         }
       } catch {
-        setServerError('حدث خطأ في الاتصال')
+        toast.error('حدث خطأ في الاتصال')
       } finally {
         setLoading(false)
       }
@@ -145,13 +146,14 @@ export default function Signup() {
       })
 
       if (res.ok) {
+        toast.success('تم تفعيل الحساب بنجاح')
         router.push('/auth/signin?verified=true')
       } else {
         const err = await res.json()
-        setErrors({ verification: err.message || 'الرمز غير صحيح' })
+        toast.error(err.message || 'الرمز غير صحيح')
       }
     } catch {
-      setServerError('حدث خطأ في التحقق')
+      toast.error('حدث خطأ في التحقق')
     } finally {
       setLoading(false)
     }
@@ -226,12 +228,7 @@ export default function Signup() {
             </div>
           )}
 
-          {serverError && (
-            <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3 animate-fade-in">
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <span className="font-medium">{serverError}</span>
-            </div>
-          )}
+
 
           <div className="space-y-6">
             {step === 1 && (

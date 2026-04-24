@@ -5,21 +5,20 @@ import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Shield, Loader2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError('')
 
     if (!email || !password) {
-      setError('يرجى ملء جميع الحقول')
+      toast.error('يرجى ملء جميع الحقول')
       setLoading(false)
       return
     }
@@ -32,12 +31,13 @@ export default function SignIn() {
       })
 
       if (result?.error) {
-        setError('البريد الإلكتروني أو كلمة المرور غير صحيحة')
+        toast.error('البريد الإلكتروني أو كلمة المرور غير صحيحة')
       } else {
+        toast.success('تم تسجيل الدخول بنجاح')
         window.location.href = '/feed'
       }
     } catch {
-      setError('حدث خطأ. يرجى المحاولة مرة أخرى')
+      toast.error('حدث خطأ. يرجى المحاولة مرة أخرى')
     } finally {
       setLoading(false)
     }
@@ -82,12 +82,7 @@ export default function SignIn() {
             <p className="text-gray-400 text-sm">سجّل دخولك للبدء في استكشاف عالمك</p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3 animate-fade-in">
-              <Shield className="h-5 w-5 flex-shrink-0" />
-              <span className="font-medium">{error}</span>
-            </div>
-          )}
+
 
           <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
             <div className="space-y-2">
