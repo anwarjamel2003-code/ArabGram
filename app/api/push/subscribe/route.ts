@@ -11,7 +11,7 @@ import { authOptions } from '@/lib/auth'
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
   
-  if (!session?.user?.id) {
+  if (!(session?.user as any)?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -28,13 +28,13 @@ export async function POST(request: NextRequest) {
       update: {
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
-        userId: session.user.id,
+        userId: (session!.user as any).id,
       },
       create: {
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
-        userId: session.user.id,
+        userId: (session!.user as any).id,
       },
     })
 

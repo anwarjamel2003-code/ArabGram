@@ -11,7 +11,7 @@ import { sendPushNotification } from '@/lib/push'
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
   const otherUserId = searchParams.get('otherUserId')
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // Return chat list for the current user
     const chats = await prisma.message.findMany({
       where: {
-        OR: [{ senderId: session.user.id }, { receiverId: session.user.id }],
+        OR: [{ senderId: (session!.user as any).id }, { receiverId: (session!.user as any).id }],
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
   const messages = await prisma.message.findMany({
     where: {
       OR: [
-        { senderId: session.user.id, receiverId: otherUserId },
-        { senderId: otherUserId, receiverId: session.user.id },
+        { senderId: (session!.user as any).id, receiverId: otherUserId },
+        { senderId: otherUserId, receiverId: (session!.user as any).id },
       ],
     },
     orderBy: { createdAt: 'asc' },
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { text, receiverId } = await request.json()
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const message = await prisma.message.create({
       data: {
         text,
-        senderId: session.user.id,
+        senderId: (session!.user as any).id,
         receiverId,
       },
       include: {
@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
     await sendPushNotification(receiverId, {
       title: `رسالة جديدة من ${message.sender.name || message.sender.username}`,
       body: text.length > 100 ? `${text.substring(0, 97)}...` : text,
-      url: `/messages?userId=${session.user.id}`,
-      tag: `msg-${session.user.id}`,
+      url: `/messages?userId=${(session!.user as any).id}`,
+      tag: `msg-${(session!.user as any).id}`,
     })
 
     return NextResponse.json(message)

@@ -11,7 +11,7 @@ import { sendPushNotification } from '@/lib/push'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { receiverId, type } = await request.json()
 
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       data: {
         type,
         status: 'ringing',
-        callerId: session.user.id,
+        callerId: (session!.user as any).id,
         receiverId,
       },
       include: {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       title: `مكالمة ${type === 'video' ? 'فيديو' : 'صوتية'} واردة`,
       body: `مكالمة من ${call.caller.name || call.caller.username}`,
       url: `/calls?callId=${call.id}`,
-      tag: `call-${session.user.id}`,
+      tag: `call-${(session!.user as any).id}`,
     })
 
     return NextResponse.json(call)
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { callId, status, startedAt, endedAt } = await request.json()
 
@@ -72,7 +72,7 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
   const otherUserId = searchParams.get('otherUserId')
@@ -82,8 +82,8 @@ export async function GET(request: NextRequest) {
     const calls = await prisma.call.findMany({
       where: {
         OR: [
-          { callerId: session.user.id, receiverId: otherUserId },
-          { callerId: otherUserId, receiverId: session.user.id },
+          { callerId: (session!.user as any).id, receiverId: otherUserId },
+          { callerId: otherUserId, receiverId: (session!.user as any).id },
         ],
       },
       orderBy: { createdAt: 'desc' },

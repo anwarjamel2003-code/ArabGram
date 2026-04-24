@@ -15,7 +15,7 @@ const signalingStore = new Map<string, any[]>()
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
+  if (!(session?.user as any)?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     signalingStore.get(callId)?.push({
-      from: session.user.id,
+      from: (session!.user as any).id,
       signal,
       type,
       timestamp: Date.now(),
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
+  if (!(session?.user as any)?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     const signals = signalingStore.get(callId) || []
     
     // Filter signals for this user (not from themselves)
-    const relevantSignals = signals.filter((s) => s.from !== session.user.id)
+    const relevantSignals = signals.filter((s) => s.from !== (session!.user as any).id)
 
     // Clear old signals (older than 5 minutes)
     const now = Date.now()

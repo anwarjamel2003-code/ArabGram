@@ -13,11 +13,11 @@ export const runtime = 'nodejs'
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
   
-  if (!session?.user?.id) {
+  if (!(session?.user as any)?.id) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const userId = session.user.id
+  const userId = (session!.user as any).id
   const encoder = new TextEncoder()
 
   const stream = new ReadableStream({

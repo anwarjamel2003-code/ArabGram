@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('userId')
@@ -50,17 +50,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { targetId } = await request.json()
 
   if (!targetId) return NextResponse.json({ error: 'targetId required' }, { status: 400 })
-  if (targetId === session.user.id) return NextResponse.json({ error: 'Cannot follow self' }, { status: 400 })
+  if (targetId === (session!.user as any).id) return NextResponse.json({ error: 'Cannot follow self' }, { status: 400 })
 
   try {
     const follow = await prisma.follow.create({
       data: {
-        followerId: session.user.id,
+        followerId: (session!.user as any).id,
         followingId: targetId
       },
       include: {
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { targetId } = await request.json()
 
@@ -83,7 +83,7 @@ export async function DELETE(request: NextRequest) {
 
   await prisma.follow.deleteMany({
     where: {
-      followerId: session.user.id,
+      followerId: (session!.user as any).id,
       followingId: targetId
     }
   })
