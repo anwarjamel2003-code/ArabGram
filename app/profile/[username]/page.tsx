@@ -3,11 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { User, Users, Image as ImageIcon, ShieldCheck, Grid, Heart, MessageCircle, Settings, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 import EditProfileModal from "@/components/EditProfileModal"
-import PostCard from "@/components/PostCard"
-import { User, Users, Image } from 'lucide-react'
 
 interface UserProfile {
   id: string
@@ -36,27 +34,35 @@ export default function ProfilePage() {
 
   const currentUserId = (session?.user as any)?.id
   const isOwnProfile = profile?.id === currentUserId
-  const fullUsername = `@{username}`
+  const displayUsername = typeof username === 'string' ? username.replace('%40', '') : ''
 
   useEffect(() => {
     if (!username) return
-
     fetchProfile()
-    fetchPosts()
-    checkFollowing()
   }, [username])
 
-  const fetchProfile = async () => {
-    const res = await fetch(`/api/profile?username=${username}`)
-    if (res.ok) {
-      const data = await res.json()
-      setProfile(data)
+  useEffect(() => {
+    if (profile?.id) {
+      fetchPosts()
+      checkFollowing()
     }
-    setLoading(false)
+  }, [profile])
+
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(`/api/profile?username=${displayUsername}`)
+      if (res.ok) {
+        const data = await res.json()
+        setProfile(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const fetchPosts = async () => {
-    // Fetch user's posts
     const res = await fetch(`/api/posts?userId=${profile?.id}`)
     if (res.ok) setPosts(await res.json())
   }
@@ -64,122 +70,181 @@ export default function ProfilePage() {
   const checkFollowing = async () => {
     if (!isOwnProfile && currentUserId && profile?.id) {
       const res = await fetch(`/api/follows?userId=${profile.id}&type=followers`)
-      const { count } = await res.json()
-      setFollowersCount(count)
-      // Check if current user follows
-      // TODO: Add isFollowing check via API
+      if (res.ok) {
+        const { count } = await res.json()
+        setFollowersCount(count)
+      }
+    } else if (profile) {
+      setFollowersCount(profile._count.followers)
     }
   }
 
   const handleFollow = async () => {
     const method = following ? 'DELETE' : 'POST'
-    await fetch('/api/follows', { method, body: JSON.stringify({ targetId: profile!.id }) })
+    await fetch('/api/follows', { 
+      method, 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetId: profile!.id }) 
+    })
     setFollowing(!following)
     setFollowersCount(prev => following ? prev - 1 : prev + 1)
   }
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 bg-[#050505]">
+        <Loader2 className="h-12 w-12 text-brand-primary animate-spin" />
+      </div>
+    )
+  }
 
-  if (!profile) return <div>User not found</div>
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 text-center">
+        <div className="glass-card p-12 rounded-[3rem] max-w-md">
+          <User className="h-16 w-16 text-gray-700 mx-auto mb-6" />
+          <h2 className="text-2xl font-black text-white mb-2">المستخدم غير موجود</h2>
+          <p className="text-gray-500 mb-8">عذراً، لم نتمكن من العثور على الحساب الذي تبحث عنه.</p>
+          <Link href="/feed" className="btn-arabgram px-8 py-3 rounded-xl font-bold inline-block">العودة للرئيسية</Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-12 mb-8 border border-white/50">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-            <Avatar className="w-28 h-28 md:w-32 md:h-32 ring-4 ring-white shadow-lg">
-              <AvatarImage src={profile.image} />
-              <AvatarFallback className="w-28 h-28 md:w-32 md:h-32 text-4xl bg-gradient-to-br from-purple-500 to-pink-500">
-                {profile.name?.[0]?.toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-4 flex-wrap">
-                <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {fullUsername}
-                </h1>
-                {profile.phoneVerified && (
-                  <div className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    Verified
+    <div className="min-h-screen bg-[#050505] text-white pt-24 pb-20" dir="rtl">
+      {/* Background Blobs */}
+      <div className="bg-blob w-[400px] h-[400px] bg-brand-primary top-[-5%] right-[-5%] opacity-10" />
+      <div className="bg-blob w-[300px] h-[300px] bg-brand-secondary bottom-[10%] left-[-5%] opacity-10" />
+
+      <div className="max-w-5xl mx-auto px-4">
+        {/* Profile Header Card */}
+        <div className="glass-card rounded-[3rem] p-8 md:p-12 mb-10 relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 arabgram-gradient opacity-50" />
+          
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 relative z-10">
+            {/* Avatar Section */}
+            <div className="relative">
+              <div className="w-32 h-32 md:w-44 md:h-44 story-ring-active p-1 animate-pulse-soft">
+                <div className="w-full h-full bg-gray-900 rounded-full overflow-hidden border-4 border-black shadow-2xl">
+                  {profile.image ? (
+                    <img src={profile.image} alt={profile.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-brand-gradient">
+                      <span className="text-4xl font-black text-white">{profile.name?.[0]}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {profile.phoneVerified && (
+                <div className="absolute bottom-2 left-2 bg-emerald-500 p-1.5 rounded-full border-4 border-black shadow-lg" title="حساب موثق">
+                  <ShieldCheck className="h-5 w-5 text-white" />
+                </div>
+              )}
+            </div>
+
+            {/* Info Section */}
+            <div className="flex-1 text-center md:text-right">
+              <div className="flex flex-col md:flex-row items-center md:items-end gap-4 mb-6">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tighter">{profile.name}</h1>
+                <span className="text-brand-primary font-bold text-lg">@{profile.username}</span>
+              </div>
+              
+              {profile.bio && (
+                <p className="text-gray-400 text-lg font-medium leading-relaxed max-w-2xl mb-8">
+                  {profile.bio}
+                </p>
+              )}
+
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                {!isOwnProfile ? (
+                  <>
+                    <button 
+                      onClick={handleFollow}
+                      className={`px-10 py-3.5 rounded-2xl font-black text-lg transition-all duration-300 shadow-xl ${
+                        following 
+                        ? 'bg-white/10 text-white border border-white/20 hover:bg-white/20' 
+                        : 'btn-arabgram hover:scale-105'
+                      }`}
+                    >
+                      {following ? 'إلغاء المتابعة' : 'متابعة'}
+                    </button>
+                    <button className="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                      <MessageCircle className="h-6 w-6" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex gap-3">
+                    <EditProfileModal user={profile} onUpdate={fetchProfile} />
+                    <button className="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                      <Settings className="h-6 w-6" />
+                    </button>
                   </div>
                 )}
               </div>
-              <p className="text-2xl text-gray-600 mt-1">{profile.name}</p>
-              {profile.bio && (
-                <p className="text-xl text-gray-700 mt-4 leading-relaxed">{profile.bio}</p>
-              )}
             </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              {!isOwnProfile ? (
-                <Button 
-                  size="lg" 
-                  className="font-semibold px-8 py-6 text-lg h-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-xl"
-                  onClick={handleFollow}
-                >
-                  {following ? 'Unfollow' : 'Follow'}
-                </Button>
-              ) : (
-                <EditProfileModal user={profile} onUpdate={fetchProfile} />
-              )}
-            </div>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="grid grid-cols-3 gap-4 mt-12 pt-10 border-t border-white/5">
+            <StatBox count={profile._count.posts} label="منشور" icon={ImageIcon} />
+            <StatBox count={followersCount} label="متابع" icon={Users} />
+            <StatBox count={profile._count.following} label="يتابع" icon={User} />
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-6 mb-12">
-          <div className="text-center p-6 bg-white/80 backdrop-blur rounded-2xl shadow-xl hover:shadow-2xl transition-all">
-            <div className="text-3xl md:text-4xl font-black mb-1">{profile._count.posts}</div>
-            <div className="text-muted-foreground font-medium flex items-center justify-center gap-1">
-              <Image className="h-4 w-4" />
-              Posts
+        {/* Content Tabs / Grid */}
+        <div className="space-y-8">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-10 h-10 rounded-xl arabgram-gradient flex items-center justify-center">
+              <Grid className="h-5 w-5 text-white" />
             </div>
+            <h2 className="text-2xl font-black">المنشورات <span className="text-gray-600 text-sm mr-2 font-bold">{posts.length}</span></h2>
           </div>
-          <div className="text-center p-6 bg-white/80 backdrop-blur rounded-2xl shadow-xl hover:shadow-2xl transition-all">
-            <div className="text-3xl md:text-4xl font-black mb-1">{followersCount}</div>
-            <div className="text-muted-foreground font-medium flex items-center justify-center gap-1">
-              <Users className="h-4 w-4" />
-              Followers
-            </div>
-          </div>
-          <div className="text-center p-6 bg-white/80 backdrop-blur rounded-2xl shadow-xl hover:shadow-2xl transition-all">
-            <div className="text-3xl md:text-4xl font-black mb-1">{profile._count.following}</div>
-            <div className="text-muted-foreground font-medium flex items-center justify-center gap-1">
-              <User className="h-4 w-4" />
-              Following
-            </div>
-          </div>
-        </div>
 
-        {/* Posts Grid */}
-        <div>
-          <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-            <Image className="h-8 w-8" />
-            Posts
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {posts.map((post: any) => (
-              <div key={post.id} className="group relative aspect-square bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden cursor-pointer hover:scale-105" onClick={() => router.push(`/post/${post.id}`)}>
-                <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover group-hover:brightness-90 transition-all" />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                  <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 w-full">
-                    <div className="flex items-center justify-between text-sm font-semibold text-black">
-                      <span>{post._count.likes} likes</span>
-                      <span>{post._count.comments} comments</span>
-                    </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            {posts.map((post: any, idx) => (
+              <div 
+                key={post.id} 
+                className="group relative aspect-square rounded-[2rem] overflow-hidden cursor-pointer animate-fade-in-up"
+                style={{ animationDelay: `${idx * 100}ms` }}
+                onClick={() => router.push(`/post/${post.id}`)}
+              >
+                <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-6 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-6 w-6 text-white fill-white" />
+                    <span className="text-white font-black text-lg">{post._count?.likes || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="h-6 w-6 text-white fill-white" />
+                    <span className="text-white font-black text-lg">{post._count?.comments || 0}</span>
                   </div>
                 </div>
               </div>
             ))}
+            
             {posts.length === 0 && (
-              <div className="col-span-full text-center py-24 text-muted-foreground">
-                No posts yet.
+              <div className="col-span-full py-32 text-center glass-card rounded-[3rem]">
+                <ImageIcon className="h-16 w-16 text-gray-700 mx-auto mb-4" />
+                <p className="text-gray-500 font-bold">لا توجد منشورات حتى الآن</p>
               </div>
             )}
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function StatBox({ count, label, icon: Icon }: { count: number, label: string, icon: any }) {
+  return (
+    <div className="flex flex-col items-center group cursor-default">
+      <div className="flex items-center gap-2 mb-1 transition-transform group-hover:scale-110 duration-300">
+        <Icon className="h-4 w-4 text-brand-primary" />
+        <span className="text-2xl md:text-3xl font-black text-white">{count}</span>
+      </div>
+      <span className="text-[10px] md:text-xs text-gray-500 font-black uppercase tracking-[0.2em]">{label}</span>
     </div>
   )
 }
