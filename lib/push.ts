@@ -7,12 +7,17 @@ import { prisma } from '@/lib/prisma'
  */
 
 // Configure VAPID keys
-if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-  webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT || 'mailto:support@arabgram.com',
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-  )
+// We use a try-catch to prevent build failure if keys are missing or invalid during static generation
+try {
+  if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT || 'mailto:support@arabgram.com',
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    )
+  }
+} catch (error) {
+  console.warn('[PUSH] VAPID configuration failed. Push notifications may not work.', error)
 }
 
 interface PushPayload {

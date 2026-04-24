@@ -24,6 +24,11 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        brand: {
+          primary: '#F59E0B',
+          secondary: '#EC4899',
+          accent: '#7C3AED',
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -90,4 +95,3 @@ plugins: [],
 }
 
 export default config
-
