@@ -15,13 +15,15 @@ export default function Navigation() {
     return null
   }
 
+  const profileUsername = (session?.user as any)?.username || ''
+
   const navItems = [
     { href: '/feed', icon: Home, label: 'الرئيسية' },
     { href: '/search', icon: Compass, label: 'استكشاف' },
     { href: '/stories', icon: PlusSquare, label: 'قصة جديدة' },
     { href: '/messages', icon: MessageCircle, label: 'الرسائل' },
     { href: '/notifications', icon: Bell, label: 'الإشعارات' },
-    { href: '/profile', icon: User, label: 'الملف الشخصي' },
+    { href: profileUsername ? `/profile/${profileUsername}` : '/feed', icon: User, label: 'الملف الشخصي' },
   ]
 
   return (

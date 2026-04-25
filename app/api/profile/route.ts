@@ -5,12 +5,19 @@ import { authOptions } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const userId = searchParams.get('userId') || searchParams.get('username')
+  const param = searchParams.get('username') || searchParams.get('userId')
 
-  if (!userId) return NextResponse.json({ error: 'userId or username required' }, { status: 400 })
+  if (!param) return NextResponse.json({ error: 'userId or username required' }, { status: 400 })
 
+  // Try to find by username first (most common), then by id
+  const cleanParam = param.startsWith('@') ? param.slice(1) : param
   const user = await prisma.user.findFirst({
-    where: userId.startsWith('@') ? { username: userId.slice(1) } : { id: userId },
+    where: {
+      OR: [
+        { username: cleanParam },
+        { id: param },
+      ]
+    },
     select: {
       id: true,
       name: true,

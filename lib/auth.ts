@@ -1,11 +1,9 @@
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
 import { comparePassword } from '@/lib/security'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -51,12 +49,21 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      // When using 'database' strategy, the 'user' object is passed instead of 'token'
-      if (session.user && user) {
-        ;(session.user as any).id = user.id
-        ;(session.user as any).username = (user as any).username
-        ;(session.user as any).role = (user as any).role
+    async jwt({ token, user }) {
+      // On first sign-in, 'user' is available from authorize()
+      if (user) {
+        token.id = user.id
+        token.username = (user as any).username
+        token.role = (user as any).role
+      }
+      return token
+    },
+    async session({ session, token }) {
+      // Pass token data into session so client can read it
+      if (session.user && token) {
+        ;(session.user as any).id = token.id
+        ;(session.user as any).username = token.username
+        ;(session.user as any).role = token.role
       }
       return session
     },
@@ -66,7 +73,7 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/signin',
   },
   session: {
-    strategy: 'database', // Real session persistence in DB
+    strategy: 'jwt',       // JWT works with CredentialsProvider (database doesn't!)
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
