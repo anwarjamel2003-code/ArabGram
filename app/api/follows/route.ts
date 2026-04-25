@@ -64,9 +64,22 @@ export async function POST(request: NextRequest) {
         followingId: targetId
       },
       include: {
-        following: { select: { id: true, name: true, username: true } }
+        following: { select: { id: true, name: true, username: true } },
+        follower: { select: { name: true, image: true } },
       }
     })
+
+    // Send real-time notification to followed user
+    const { broadcastNotification } = await import('@/lib/supabase-server')
+    await broadcastNotification(targetId, {
+      id: `follow-${follow.id}`,
+      type: 'follow',
+      actorImage: follow.follower.image || '/arabgram-logo.png',
+      actorInitials: follow.follower.name?.[0] || 'U',
+      message: `${follow.follower.name} بدأ متابعتك`,
+      time: 'الآن',
+    })
+
     return NextResponse.json(follow)
   } catch (e) {
     return NextResponse.json({ error: 'Already following' }, { status: 409 })

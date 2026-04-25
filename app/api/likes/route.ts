@@ -58,8 +58,25 @@ export async function POST(request: NextRequest) {
       data: {
         postId,
         userId: (session.user as any).id
+      },
+      include: {
+        post: { select: { userId: true } },
+        user: { select: { name: true, image: true } },
       }
     })
+
+    // Send real-time notification to post owner
+    if (like.post.userId !== (session.user as any).id) {
+      const { broadcastNotification } = await import('@/lib/supabase-server')
+      await broadcastNotification(like.post.userId, {
+        id: `like-${like.id}`,
+        type: 'like',
+        actorImage: like.user.image || '/arabgram-logo.png',
+        actorInitials: like.user.name?.[0] || 'U',
+        message: `${like.user.name} أعجب بمنشورك`,
+        time: 'الآن',
+      })
+    }
 
     return NextResponse.json({ liked: true, like }, { status: 201 })
   } catch (error) {
