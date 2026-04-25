@@ -1,113 +1,148 @@
 'use client'
 
 import { Input } from "@/components/ui/input"
-import { Search, User, Hash, ImageIcon as ImageIconComponent, Loader } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Search, User, Hash, ImageIcon as ImageIconComponent, Loader2 } from "lucide-react"
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 export default function SearchPage() {
   const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [tab, setTab] = useState('users')
+  const [results, setResults] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
 
   const tabs = [
-    { id: 'users', icon: User, label: 'Users' },
-    { id: 'posts', icon: Hash, label: 'Posts' },
-    { id: 'stories', icon: ImageIconComponent, label: 'Stories' }
+    { id: 'users', icon: User, label: 'المستخدمين' },
+    { id: 'posts', icon: Hash, label: 'المنشورات' },
   ]
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [query])
+
+  useEffect(() => {
+    fetchResults()
+  }, [debouncedQuery, tab])
+
+  const fetchResults = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/search?q=${debouncedQuery}&tab=${tab}`)
+      if (res.ok) {
+        const data = await res.json()
+        setResults(data)
+      }
+    } catch (error) {
+      console.error('Search failed', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Search Bar */}
-        <div className="relative mb-8">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
-            placeholder="Search Arabgram..."
-            className="pl-12 pr-4 py-4 bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border-0 focus:ring-4 focus:ring-purple-500/20 h-14 text-lg"
+    <div className="max-w-3xl mx-auto pb-24 pt-24 px-4" dir="rtl">
+      {/* Search Header */}
+      <div className="mb-10 text-center animate-fade-in">
+        <h1 className="text-4xl font-black text-white mb-4 tracking-tighter">
+          ابحث في <span className="arabgram-text-gradient">ArabGram</span>
+        </h1>
+        <p className="text-gray-400 font-medium">اكتشف أصدقاء جدد، ومنشورات مميزة</p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative mb-8 group animate-fade-in-up">
+        <div className="absolute inset-0 bg-brand-primary/20 blur-xl rounded-2xl group-hover:bg-brand-primary/30 transition-colors duration-500" />
+        <div className="relative flex items-center glass-card rounded-2xl overflow-hidden p-2">
+          <div className="pl-4 pr-3">
+            <Search className="h-6 w-6 text-brand-primary" />
+          </div>
+          <input
+            placeholder="ابحث هنا..."
+            className="w-full bg-transparent border-none focus:ring-0 text-white text-lg font-medium placeholder:text-gray-500 h-12"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
+          {loading && <Loader2 className="h-6 w-6 text-brand-primary animate-spin mr-3" />}
         </div>
+      </div>
 
-        {/* Tabs */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-1 shadow-xl mb-8">
-          <div className="flex gap-1">
-            {tabs.map(({ id, icon: Icon, label }: any) => (
-              <Button
-                key={id}
-                variant={tab === id ? 'default' : 'ghost'}
-                className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
-                  tab === id ? 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg' : 'hover:bg-purple-50'
-                }`}
-                onClick={() => setTab(id)}
-              >
-                <Icon className="h-5 w-5 mr-2" />
-                {label}
-              </Button>
-            ))}
+      {/* Tabs */}
+      <div className="flex gap-2 mb-10 bg-white/5 p-2 rounded-2xl border border-white/10 animate-fade-in-up delay-100">
+        {tabs.map(({ id, icon: Icon, label }) => (
+          <button
+            key={id}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${
+              tab === id 
+                ? 'arabgram-gradient text-white shadow-lg' 
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+            onClick={() => setTab(id)}
+          >
+            <Icon className="h-5 w-5" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Results */}
+      <div className="space-y-4 min-h-[40vh] animate-fade-in-up delay-200">
+        {results.length === 0 && !loading ? (
+          <div className="text-center py-20">
+            <Search className="h-16 w-16 text-gray-700 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-400 mb-2">لا توجد نتائج</h2>
+            <p className="text-gray-600">حاول البحث بكلمات مختلفة</p>
           </div>
-        </div>
-
-        {/* Results */}
-        <div className="space-y-4">
-          {tab === 'users' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i} className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 border border-transparent hover:border-purple-200">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
-                      <span className="text-white font-bold text-xl">U{i+1}</span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-xl text-gray-900 group-hover:text-purple-600 transition-colors">@user{i+1}</h3>
-                      <p className="text-gray-600">Lorem ipsum dolor amet...</p>
-                    </div>
-                  </div>
-                  <Button className="mt-4 w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-                    Follow
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {tab === 'posts' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="group relative aspect-video bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all cursor-pointer">
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-xl p-3 w-full">
-                      <div className="flex justify-between items-center">
-                        <div className="font-bold text-gray-900 truncate">Post title</div>
-                        <div className="flex gap-1 text-sm text-gray-600">
-                          <span>❤️ 124</span>
-                          <span>💬 23</span>
-                        </div>
+        ) : (
+          tab === 'users' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {results.map((user, i) => (
+                <Link key={user.id} href={`/profile/${user.username}`}>
+                  <div className="glass-card p-5 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition-colors group">
+                    <div className="w-14 h-14 story-ring-active p-[2px] group-hover:scale-110 transition-transform">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-gray-900 border-2 border-black">
+                        {user.image ? (
+                          <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-brand-gradient">
+                            <span className="text-white font-bold">{user.name?.charAt(0)}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
+                    <div>
+                      <h3 className="font-bold text-white group-hover:text-brand-primary transition-colors text-lg">{user.name}</h3>
+                      <p className="text-sm text-gray-500 font-medium">@{user.username}</p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
-          )}
+          )
+        )}
 
-          {tab === 'stories' && (
-            <div className="flex gap-4 overflow-x-auto pb-4 -mb-4">
-              {Array.from({ length: 20 }).map((_, i) => (
-                <div key={i} className="flex flex-col items-center group cursor-pointer flex-shrink-0 w-20">
-                  <div className="w-16 h-16 bg-gradient-to-br from-pink-400 via-purple-500 to-indigo-500 rounded-2xl shadow-lg ring-4 ring-white/50 group-hover:scale-110 transition-all flex items-center justify-center">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse border-4 border-white" />
+        {tab === 'posts' && results.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {results.map((post, i) => (
+              <div key={post.id} className="group relative aspect-square glass-card rounded-2xl overflow-hidden cursor-pointer hover:shadow-2xl transition-all">
+                <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                  <div className="w-full">
+                    <p className="text-white font-bold text-sm line-clamp-1 mb-2">{post.caption}</p>
+                    <div className="flex gap-4 text-sm font-black text-brand-primary">
+                      <span className="flex items-center gap-1"><Heart className="h-4 w-4" /> {post._count.likes}</span>
+                      <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> {post._count.comments}</span>
+                    </div>
                   </div>
-                  <span className="text-xs text-gray-600 mt-2 text-center leading-tight truncate w-20">user{i+1}</span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
 }
-

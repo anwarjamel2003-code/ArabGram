@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Clock, Plus, Eye, Trash2, Share2 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Story {
   id: string
@@ -15,65 +15,36 @@ interface Story {
   }
   expiresAt: string
   views: number
-  image: string
-  initial: string
+  imageUrl: string
 }
 
-const mockStories: Story[] = [
-  {
-    id: '1',
-    user: { name: 'محمد أحمد', username: 'mohammad_ahmed', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
-    expiresAt: '2h',
-    views: 234,
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500',
-    initial: 'م',
-  },
-  {
-    id: '2',
-    user: { name: 'سارة علي', username: 'sarah_ali', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150' },
-    expiresAt: '4h',
-    views: 567,
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500',
-    initial: 'س',
-  },
-  {
-    id: '3',
-    user: { name: 'علي محمود', username: 'ali_mahmoud', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
-    expiresAt: '8h',
-    views: 890,
-    image: 'https://images.unsplash.com/photo-1519085360771-9852ef158dba?w=500',
-    initial: 'ع',
-  },
-  {
-    id: '4',
-    user: { name: 'فاطمة خالد', username: 'fatima_khalid', image: 'https://images.unsplash.com/photo-1517841905240-1c28a93fe869?w=150' },
-    expiresAt: '1h',
-    views: 345,
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500',
-    initial: 'ف',
-  },
-  {
-    id: '5',
-    user: { name: 'عمر حسن', username: 'omar_hassan', image: 'https://images.unsplash.com/photo-1519085360771-9852ef158dba?w=150' },
-    expiresAt: '3h',
-    views: 456,
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500',
-    initial: 'ع',
-  },
-  {
-    id: '6',
-    user: { name: 'ليلى إبراهيم', username: 'leila_ibrahim', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150' },
-    expiresAt: '5h',
-    views: 678,
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500',
-    initial: 'ل',
-  },
-]
 
 export default function Stories() {
   const { data: session } = useSession()
-  const [stories, setStories] = useState<Story[]>(mockStories)
+  const [stories, setStories] = useState<Story[]>([])
   const [selectedStory, setSelectedStory] = useState<Story | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchStories()
+  }, [])
+
+  const fetchStories = async () => {
+    try {
+      const res = await fetch('/api/stories')
+      if (res.ok) {
+        const data = await res.json()
+        setStories(data.map((s: any) => ({
+          ...s,
+          views: Math.floor(Math.random() * 500) + 10, // Mock views as they are not in DB
+        })))
+      }
+    } catch (err) {
+      console.error('Failed to fetch stories', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const deleteStory = (id: string) => {
     setStories(stories.filter(s => s.id !== id))
@@ -113,8 +84,8 @@ export default function Stories() {
               <div className="relative overflow-hidden rounded-3xl aspect-[9/16] bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 {/* Background Image */}
                 <Image
-                  src={story.image}
-                  alt={story.user.name}
+                  src={story.imageUrl}
+                  alt={story.user.name || 'Story'}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -198,8 +169,8 @@ export default function Stories() {
 
               {/* Story Image */}
               <Image
-                src={selectedStory.image}
-                alt={selectedStory.user.name}
+                src={selectedStory.imageUrl}
+                alt={selectedStory.user.name || 'Story'}
                 fill
                 className="object-cover"
               />

@@ -18,14 +18,14 @@ export default function Home() {
             <div className="flex justify-center mb-12">
               <div className="relative group">
                 <div className="absolute inset-0 arabgram-gradient blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-700 animate-pulse-soft" />
-                <div className="relative overflow-hidden rounded-[3.5rem] p-[5px] transition-all duration-700 group-hover:scale-110 group-hover:rotate-6">
+                <div className="relative overflow-hidden rounded-[4rem] p-[6px] transition-all duration-700 group-hover:scale-110 group-hover:rotate-6">
                   <div className="absolute inset-0 arabgram-gradient animate-spin-slow" />
-                  <div className="relative bg-black rounded-[3.3rem] p-8">
+                  <div className="relative bg-black rounded-[3.8rem] p-8">
                     <Image
                       src="/arabgram-logo.png"
                       alt="ArabGram Logo"
-                      width={200}
-                      height={200}
+                      width={280}
+                      height={280}
                       className="rounded-3xl object-contain animate-float"
                       priority
                     />

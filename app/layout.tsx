@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
+import Navigation from '@/components/Navigation'
 
 
 const inter = Inter({ subsets: ['latin'] })
@@ -20,8 +21,13 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <main className="container mx-auto p-4 max-w-6xl">
-            {children}
+          <main className="min-h-screen">
+            <Navigation />
+            <div className="md:pr-72 pb-24 md:pb-0 pt-16 md:pt-0">
+              <div className="container mx-auto p-4 max-w-6xl">
+                {children}
+              </div>
+            </div>
           </main>
         </Providers>
       </body>

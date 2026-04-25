@@ -56,14 +56,14 @@ export default function SignIn() {
           <div className="flex justify-center mb-6">
             <div className="relative group">
               <div className="absolute inset-0 arabgram-gradient blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500 animate-pulse-soft" />
-              <div className="relative overflow-hidden rounded-[2.5rem] p-[3px] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+              <div className="relative overflow-hidden rounded-[3.5rem] p-[4px] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
                 <div className="absolute inset-0 arabgram-gradient animate-spin-slow" />
-                <div className="relative bg-black rounded-[2.3rem] p-3">
+                <div className="relative bg-black rounded-[3.3rem] p-4">
                   <Image
                     src="/arabgram-logo.png"
                     alt="ArabGram"
-                    width={120}
-                    height={120}
+                    width={180}
+                    height={180}
                     className="rounded-3xl object-contain"
                     priority
                   />
