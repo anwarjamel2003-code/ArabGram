@@ -47,6 +47,7 @@ export default function Signup() {
   const [verificationCode, setVerificationCode] = useState('')
   const [sentCode, setSentCode] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [serverError, setServerError] = useState('')
   const [resendCountdown, setResendCountdown] = useState(0)
 
   const currentStep = steps[step - 1]
