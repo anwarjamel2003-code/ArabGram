@@ -28,8 +28,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة')
         }
 
-        // Check if email is verified (phoneVerified is used for email verification)
-        if (!user.phoneVerified) {
+        // Check if email is verified
+        if (!user.emailVerified) {
           throw new Error('يرجى التحقق من بريدك الإلكتروني أولاً')
         }
 
@@ -51,24 +51,12 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
-      if (user) {
-        token.id = user.id
-        token.username = (user as any).username
-        token.role = (user as any).role
-      }
-      
-      if (trigger === 'update' && session) {
-        return { ...token, ...session.user }
-      }
-      
-      return token
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        ;(session.user as any).id = token.id
-        ;(session.user as any).username = token.username
-        ;(session.user as any).role = token.role
+    async session({ session, user }) {
+      // When using 'database' strategy, the 'user' object is passed instead of 'token'
+      if (session.user && user) {
+        ;(session.user as any).id = user.id
+        ;(session.user as any).username = (user as any).username
+        ;(session.user as any).role = (user as any).role
       }
       return session
     },
@@ -78,7 +66,7 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/signin',
   },
   session: {
-    strategy: 'jwt',
+    strategy: 'database', // Real session persistence in DB
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,

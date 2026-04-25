@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { hashPassword } from '@/lib/security'
 import { z } from 'zod'
 import { generateVerificationCode, sendVerificationEmail } from '@/lib/email'
 
@@ -12,7 +13,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email } = schema.parse(body)
 
-    // Get user
     const user = await prisma.user.findUnique({
       where: { email },
     })
@@ -24,29 +24,37 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if already verified
-    if (user.phoneVerified) {
+    if (user.emailVerified) {
       return NextResponse.json(
-        { message: 'الحساب مفعل بالفعل' },
+        { message: 'البريد الإلكتروني تم التحقق منه بالفعل' },
         { status: 400 }
       )
     }
 
-    // Generate new verification code
+    // Generate new code
     const verificationCode = generateVerificationCode()
+    const hashedCode = await hashPassword(verificationCode)
+    const codeExpiry = new Date(Date.now() + 10 * 60 * 1000)
 
-    // Send verification email
-    const emailSent = await sendVerificationEmail(email, verificationCode, user.name || user.username)
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        verificationCode: hashedCode,
+        verificationCodeExpires: codeExpiry,
+      },
+    })
+
+    const emailSent = await sendVerificationEmail(email, verificationCode, user.name || '')
 
     if (!emailSent) {
       return NextResponse.json(
-        { message: 'فشل إرسال البريد الإلكتروني' },
+        { message: 'فشل إرسال البريد الإلكتروني. يرجى المحاولة لاحقاً' },
         { status: 500 }
       )
     }
 
     return NextResponse.json(
-      { message: 'تم إعادة إرسال الرمز بنجاح' },
+      { message: 'تم إعادة إرسال رمز التحقق بنجاح' },
       { status: 200 }
     )
   } catch (error) {
