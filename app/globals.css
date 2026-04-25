@@ -4,33 +4,33 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%; /* soft slate/blue tinted white */
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 271 91% 65%;
+    --primary: 244 76% 59%; /* Indigo */
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
+    --secondary: 191 97% 37%; /* Cyan */
+    --secondary-foreground: 210 40% 98%;
+    --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --accent: 191 97% 37%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 271 91% 65%;
-    --radius: 1rem;
+    --ring: 244 76% 59%;
+    --radius: 1.5rem;
     
     /* ArabGram Brand Colors */
-    --brand-primary: #7C3AED;
-    --brand-secondary: #EC4899;
-    --brand-accent: #F59E0B;
-    --brand-gradient: linear-gradient(135deg, #F59E0B 0%, #EC4899 50%, #7C3AED 100%);
-    --brand-gradient-soft: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(236, 48, 153, 0.1) 50%, rgba(124, 58, 237, 0.1) 100%);
+    --brand-primary: #4F46E5;
+    --brand-secondary: #06B6D4;
+    --brand-accent: #10B981;
+    --brand-gradient: linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%);
+    --brand-gradient-soft: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
   }
   .dark {
     --background: 224 71% 4%;
@@ -80,18 +80,30 @@
 
 /* Glassmorphism */
 .glass-effect {
+<<<<<<< Updated upstream
   @apply bg-white/80 backdrop-blur-2xl border border-white/60 shadow-xl;
+=======
+  @apply bg-white/60 backdrop-blur-2xl border border-white/50 shadow-sm;
+>>>>>>> Stashed changes
 }
 .glass-effect-dark {
   @apply bg-white/40 backdrop-blur-2xl border border-white/40 shadow-lg;
 }
 
 .glass-card {
+<<<<<<< Updated upstream
   @apply bg-white/90 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(124,58,237,0.06)];
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .glass-card:hover {
   @apply border-white/80 bg-white shadow-[0_15px_40px_rgb(124,58,237,0.12)];
+=======
+  @apply bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.glass-card:hover {
+  @apply border-white/80 bg-white/90 shadow-[0_20px_40px_rgb(0,0,0,0.08)];
+>>>>>>> Stashed changes
   transform: translateY(-5px) scale(1.01);
 }
 
@@ -137,7 +149,7 @@
 
 /* Cards & Components */
 .arabgram-card {
-  @apply rounded-3xl overflow-hidden glass-card;
+  @apply rounded-3xl overflow-hidden glass-card bg-white/70 shadow-lg border-white/50;
 }
 
 .btn-arabgram {
@@ -179,5 +191,9 @@
 
 /* Input Fields */
 .arabgram-input {
+<<<<<<< Updated upstream
   @apply w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-primary/20 focus:border-brand-primary transition-all duration-300 shadow-sm;
+=======
+  @apply w-full bg-white/50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:bg-white transition-all duration-300 shadow-sm hover:border-slate-300;
+>>>>>>> Stashed changes
 }

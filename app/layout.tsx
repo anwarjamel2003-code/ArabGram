@@ -21,6 +21,7 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
+<<<<<<< Updated upstream
           <main className="min-h-screen">
             <Navigation />
             <div className="md:pr-72 pb-24 md:pb-0 pt-16 md:pt-0">
@@ -28,6 +29,10 @@ export default function RootLayout({
                 {children}
               </div>
             </div>
+=======
+          <main className="w-full flex-1 flex flex-col">
+            {children}
+>>>>>>> Stashed changes
           </main>
         </Providers>
       </body>

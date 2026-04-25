@@ -25,9 +25,9 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         brand: {
-          primary: '#F59E0B',
-          secondary: '#EC4899',
-          accent: '#7C3AED',
+          primary: '#4F46E5',
+          secondary: '#06B6D4',
+          accent: '#10B981',
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -58,13 +58,13 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
         arabgram: {
-          purple: '#7C3AED',
-          orange: '#F59E0B',
-          pink: '#EC4899',
-          blue: '#3B82F6',
-          red: '#EF4444',
-          yellow: '#FBBF24',
-          gradient: 'linear-gradient(135deg, #F59E0B 0%, #EC4899 50%, #7C3AED 100%)',
+          indigo: '#4F46E5',
+          cyan: '#06B6D4',
+          emerald: '#10B981',
+          rose: '#F43F5E',
+          amber: '#F59E0B',
+          slate: '#0F172A',
+          gradient: 'linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)',
         },
         instagram: {
           gradient: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)'
