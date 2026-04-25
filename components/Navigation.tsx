@@ -15,8 +15,8 @@ export default function Navigation() {
 
   const currentUserId = (session?.user as any)?.id
 
-  // Do not show navigation on auth pages or landing page if not logged in
-  if (pathname.startsWith('/auth') || (pathname === '/' && !session)) {
+  // Do not show navigation on auth pages or landing page
+  if (pathname.startsWith('/auth') || pathname === '/') {
     return null
   }
 
@@ -54,78 +54,74 @@ export default function Navigation() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col fixed right-0 top-0 bottom-0 w-72 glass-effect border-l border-slate-200/50 z-50 p-6 animate-fade-in">
-        <Link href="/feed" className="flex items-center gap-4 mb-12 group">
-          <div className="relative overflow-hidden rounded-2xl p-[2px] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-            <div className="absolute inset-0 arabgram-gradient animate-spin-slow opacity-80" />
-            <div className="relative bg-white rounded-[16px] p-2 shadow-sm">
-              <Image src="/arabgram-logo.png" alt="ArabGram" width={60} height={60} className="rounded-xl object-contain" />
+      {/* Top Glass Navbar for Desktop & Mobile */}
+      <nav className="fixed top-0 left-0 right-0 h-20 bg-black/50 backdrop-blur-2xl border-b border-white/5 z-50 flex items-center justify-between px-6 transition-all duration-300">
+        <div className="flex items-center gap-8">
+          <Link href="/feed" className="flex items-center gap-3 group">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-400 p-[1px] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all duration-500">
+               <div className="w-full h-full bg-black/90 rounded-[15px] flex items-center justify-center backdrop-blur-xl">
+                 <Image src="/arabgram-logo.png" alt="ArabGram" width={32} height={32} className="object-contain" />
+               </div>
             </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-3xl font-black tracking-tighter arabgram-text-gradient leading-none">ArabGram</span>
-          </div>
-        </Link>
+            <span className="font-black text-2xl tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-cyan-400 transition-all duration-300 hidden sm:block">
+              ArabGram
+            </span>
+          </Link>
 
-        <div className="flex-1 flex flex-col gap-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative ${
-                  isActive 
-                    ? 'bg-brand-primary/10 text-brand-primary font-black shadow-sm border border-brand-primary/20' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-bold'
-                }`}
-              >
-                <div className="relative">
-                  <item.icon className={`h-6 w-6 transition-transform duration-300 ${isActive ? 'scale-110 text-brand-primary' : 'group-hover:scale-110 group-hover:-rotate-6'}`} />
-                  {item.badge > 0 && (
-                    <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 shadow-sm animate-bounce">
-                      {item.badge > 9 ? '9+' : item.badge}
-                    </span>
-                  )}
-                </div>
-                <span className="text-lg">{item.label}</span>
-              </Link>
-            )
-          })}
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300 relative group ${
+                    isActive ? 'text-white bg-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <div className="relative">
+                    <item.icon className={`h-5 w-5 transition-transform duration-300 ${isActive ? 'scale-110 text-cyan-400' : 'group-hover:scale-110'}`} />
+                    {item.badge > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] bg-indigo-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-sm animate-bounce">
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm font-semibold">{item.label}</span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
 
-        <button
-          onClick={() => signOut({ callbackUrl: '/' })}
-          className="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-red-400 font-bold hover:bg-red-50 hover:text-red-500 transition-all duration-300 mt-auto group"
-        >
-          <LogOut className="h-6 w-6 transition-transform group-hover:-translate-x-1" />
-          <span className="text-lg">تسجيل الخروج</span>
-        </button>
-      </aside>
+        <div className="flex items-center gap-4">
+          {/* Mobile specific quick actions */}
+          <div className="md:hidden flex items-center gap-2">
+            <Link href="/notifications" className="relative p-2 text-zinc-400 hover:text-white">
+              <Bell className="h-6 w-6" />
+              {unreadNotifs > 0 && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-500 rounded-full animate-pulse" />
+              )}
+            </Link>
+            <Link href="/messages" className="relative p-2 text-zinc-400 hover:text-white">
+              <MessageCircle className="h-6 w-6" />
+            </Link>
+          </div>
 
-      {/* Mobile Top Navbar */}
-      <nav className="md:hidden fixed top-0 left-0 right-0 h-16 glass-effect border-b border-slate-200/50 z-50 flex items-center justify-between px-4">
-        <Link href="/feed" className="flex items-center gap-3">
-          <Image src="/arabgram-logo.png" alt="ArabGram" width={40} height={40} className="rounded-xl" />
-          <span className="font-black text-xl arabgram-text-gradient">ArabGram</span>
-        </Link>
-        <div className="flex items-center gap-1">
-          <Link href="/notifications" className="relative p-2 text-slate-500 hover:text-brand-primary">
-            <Bell className="h-5 w-5" />
-            {unreadNotifs > 0 && (
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
-            )}
-          </Link>
-          <Link href="/messages" className="relative p-2 text-slate-500 hover:text-brand-primary">
-            <MessageCircle className="h-5 w-5" />
-          </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 group"
+          >
+            <span className="text-sm font-semibold">خروج</span>
+            <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          </button>
         </div>
       </nav>
 
       {/* Mobile Floating Bottom Bar */}
-      <div className="md:hidden fixed bottom-5 left-4 right-4 z-50 pointer-events-none">
-        <div className="glass-card pointer-events-auto rounded-[2rem] p-1.5 flex items-center justify-between shadow-xl">
+      <div className="md:hidden fixed bottom-6 left-4 right-4 z-50 pointer-events-none">
+        <div className="bg-black/60 backdrop-blur-2xl border border-white/10 pointer-events-auto rounded-[2rem] p-2 flex items-center justify-between shadow-2xl">
           {navItems.filter(i => !['/messages', '/notifications'].includes(i.href)).map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
@@ -133,11 +129,11 @@ export default function Navigation() {
                 key={item.href}
                 href={item.href}
                 className={`p-3 rounded-2xl transition-all duration-300 flex items-center justify-center relative ${
-                  isActive ? 'text-brand-primary' : 'text-slate-400 hover:text-slate-900'
+                  isActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
-                {isActive && <div className="absolute inset-0 arabgram-gradient rounded-2xl opacity-10 animate-pulse-soft" />}
-                <item.icon className={`h-5 w-5 relative z-10 ${isActive ? 'text-brand-primary' : ''}`} />
+                {isActive && <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-100" />}
+                <item.icon className={`h-6 w-6 relative z-10 ${isActive ? 'text-cyan-400' : ''}`} />
               </Link>
             )
           })}

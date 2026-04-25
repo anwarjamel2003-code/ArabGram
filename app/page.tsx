@@ -19,26 +19,26 @@ export default function Home() {
       <nav className="fixed w-full z-50 top-0 border-b border-white/5 bg-black/50 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-400 p-[1px] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all duration-500">
-               <div className="w-full h-full bg-black/90 rounded-[15px] flex items-center justify-center backdrop-blur-xl">
-                 <Image src="/arabgram-logo.png" alt="ArabGram" width={24} height={24} className="object-contain" />
+            <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-br from-indigo-500 to-cyan-400 p-[2px]">
+               <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                 <Image src="/arabgram-logo.png" alt="ArabGram" width={38} height={38} className="object-contain drop-shadow-sm" />
                </div>
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-cyan-400 transition-all duration-300">
+            <span className="text-3xl font-extrabold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-cyan-400 transition-all duration-300">
               ArabGram
             </span>
           </div>
           
-          <div className="flex gap-4 items-center">
-            <Link href="/auth/signin" className="text-sm font-semibold text-zinc-400 hover:text-white transition-colors hidden sm:block">
+          <div className="flex gap-12 items-center">
+            <Link href="/auth/signin" className="text-base font-semibold text-zinc-400 hover:text-white transition-colors hidden sm:block">
               تسجيل الدخول
             </Link>
-            <Link href="/auth/signup" className="group relative px-6 py-2.5 rounded-full text-sm font-semibold overflow-hidden">
+            <Link href="/auth/signup" className="group relative px-8 py-3 rounded-full text-base font-semibold overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-cyan-500 opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300"></div>
               <span className="relative text-white flex items-center gap-2">
-                انضم الآن
-                <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                ابدأ الآن
+                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               </span>
             </Link>
           </div>
