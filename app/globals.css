@@ -80,30 +80,18 @@
 
 /* Glassmorphism */
 .glass-effect {
-<<<<<<< Updated upstream
-  @apply bg-white/80 backdrop-blur-2xl border border-white/60 shadow-xl;
-=======
   @apply bg-white/60 backdrop-blur-2xl border border-white/50 shadow-sm;
->>>>>>> Stashed changes
 }
 .glass-effect-dark {
-  @apply bg-white/40 backdrop-blur-2xl border border-white/40 shadow-lg;
+  @apply bg-black/40 backdrop-blur-2xl border border-white/10;
 }
 
 .glass-card {
-<<<<<<< Updated upstream
-  @apply bg-white/90 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(124,58,237,0.06)];
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.glass-card:hover {
-  @apply border-white/80 bg-white shadow-[0_15px_40px_rgb(124,58,237,0.12)];
-=======
   @apply bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .glass-card:hover {
   @apply border-white/80 bg-white/90 shadow-[0_20px_40px_rgb(0,0,0,0.08)];
->>>>>>> Stashed changes
   transform: translateY(-5px) scale(1.01);
 }
 
@@ -191,9 +179,5 @@
 
 /* Input Fields */
 .arabgram-input {
-<<<<<<< Updated upstream
-  @apply w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-primary/20 focus:border-brand-primary transition-all duration-300 shadow-sm;
-=======
   @apply w-full bg-white/50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:bg-white transition-all duration-300 shadow-sm hover:border-slate-300;
->>>>>>> Stashed changes
 }
