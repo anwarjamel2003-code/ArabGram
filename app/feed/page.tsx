@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, Loader2, Sparkles } from 'lucide-react'
+import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, Loader2, Sparkles, Camera } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
