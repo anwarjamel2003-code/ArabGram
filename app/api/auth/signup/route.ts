@@ -83,7 +83,6 @@ export async function POST(request: NextRequest) {
         hashedPassword,
         name: validatedData.name,
         role: 'USER',
-        phoneVerified: false,
         image: null,
         bio: null,
       },
