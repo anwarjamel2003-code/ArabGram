@@ -31,7 +31,7 @@ export default function Navigation() {
         <Link href="/feed" className="flex items-center gap-4 mb-12 group">
           <div className="relative overflow-hidden rounded-2xl p-[2px] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
             <div className="absolute inset-0 arabgram-gradient animate-spin-slow opacity-80" />
-            <div className="relative bg-black rounded-[16px] p-2">
+            <div className="relative bg-white rounded-[16px] p-2">
               <Image src="/arabgram-logo.png" alt="ArabGram" width={60} height={60} className="rounded-xl object-contain" />
             </div>
           </div>
@@ -49,8 +49,8 @@ export default function Navigation() {
                 href={item.href}
                 className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
                   isActive 
-                    ? 'bg-white/10 text-white font-black shadow-lg border border-white/5' 
-                    : 'text-gray-400 hover:bg-white/5 hover:text-white font-bold'
+                    ? 'bg-brand-primary/10 text-brand-primary font-black shadow-sm border border-brand-primary/20' 
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-bold'
                 }`}
               >
                 <item.icon className={`h-6 w-6 transition-transform duration-300 ${isActive ? 'scale-110 text-brand-primary' : 'group-hover:scale-110 group-hover:-rotate-6'}`} />
@@ -70,19 +70,19 @@ export default function Navigation() {
       </aside>
 
       {/* Mobile Top Navbar (Logo only) */}
-      <nav className="md:hidden fixed top-0 left-0 right-0 h-20 glass-effect border-b border-white/10 z-50 flex items-center justify-between px-4">
+      <nav className="md:hidden fixed top-0 left-0 right-0 h-20 glass-effect border-b border-slate-200/50 z-50 flex items-center justify-between px-4">
         <Link href="/feed" className="flex items-center gap-3">
           <Image src="/arabgram-logo.png" alt="ArabGram" width={48} height={48} className="rounded-xl" />
           <span className="font-black text-2xl arabgram-text-gradient">ArabGram</span>
         </Link>
-        <Link href="/messages" className="relative p-2 text-gray-300 hover:text-white">
+        <Link href="/messages" className="relative p-2 text-slate-500 hover:text-brand-primary">
           <MessageCircle className="h-6 w-6" />
         </Link>
       </nav>
 
       {/* Mobile Floating Bottom Bar */}
       <div className="md:hidden fixed bottom-6 left-4 right-4 z-50 pointer-events-none">
-        <div className="glass-card pointer-events-auto rounded-[2rem] p-2 flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="glass-card pointer-events-auto rounded-[2rem] p-2 flex items-center justify-between shadow-2xl">
           {navItems.filter(i => !['/messages', '/notifications'].includes(i.href)).map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
@@ -90,10 +90,10 @@ export default function Navigation() {
                 key={item.href}
                 href={item.href}
                 className={`p-3.5 rounded-2xl transition-all duration-300 flex items-center justify-center relative ${
-                  isActive ? 'text-white' : 'text-gray-400 hover:text-white'
+                  isActive ? 'text-brand-primary' : 'text-slate-400 hover:text-slate-900'
                 }`}
               >
-                {isActive && <div className="absolute inset-0 arabgram-gradient rounded-2xl opacity-20 animate-pulse-soft" />}
+                {isActive && <div className="absolute inset-0 arabgram-gradient rounded-2xl opacity-10 animate-pulse-soft" />}
                 <item.icon className={`h-6 w-6 relative z-10 ${isActive ? 'text-brand-primary' : ''}`} />
               </Link>
             )

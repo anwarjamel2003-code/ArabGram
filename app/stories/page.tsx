@@ -51,7 +51,7 @@ export default function Stories() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-20 pb-8">
+    <div className="min-h-screen bg-slate-50 pt-20 pb-8" dir="rtl">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
@@ -61,7 +61,7 @@ export default function Stories() {
             </div>
             <div>
               <h1 className="text-4xl font-black arabgram-text-gradient">القصص</h1>
-              <p className="text-gray-500 text-sm mt-1">تختفي بعد 24 ساعة</p>
+              <p className="text-slate-500 text-sm mt-1">تختفي بعد 24 ساعة</p>
             </div>
           </div>
 
@@ -137,12 +137,12 @@ export default function Stories() {
           {/* Add Story Card */}
           {session && (
             <div className="group cursor-pointer">
-              <div className="relative overflow-hidden rounded-3xl aspect-[9/16] bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-dashed border-purple-500/50 hover:border-purple-500 transition-all duration-300 flex items-center justify-center hover:-translate-y-2">
+              <div className="relative overflow-hidden rounded-3xl aspect-[9/16] bg-brand-primary/5 border-2 border-dashed border-brand-primary/30 hover:border-brand-primary transition-all duration-300 flex items-center justify-center hover:-translate-y-2">
                 <div className="text-center">
-                  <div className="w-12 h-12 arabgram-gradient rounded-2xl flex items-center justify-center mx-auto mb-2">
+                  <div className="w-12 h-12 arabgram-gradient rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-lg">
                     <Plus className="h-6 w-6 text-white" />
                   </div>
-                  <p className="text-purple-400 font-semibold text-sm">إضافة قصة</p>
+                  <p className="text-brand-primary font-bold text-sm">إضافة قصة</p>
                 </div>
               </div>
             </div>
@@ -214,9 +214,9 @@ export default function Stories() {
         {/* Empty State */}
         {stories.length === 0 && (
           <div className="text-center py-20">
-            <Clock className="h-16 w-16 text-gray-700 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-400 mb-2">لا توجد قصص حالياً</h2>
-            <p className="text-gray-600">ابدأ بإضافة قصة جديدة لمشاركة لحظاتك</p>
+            <Clock className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-slate-500 mb-2">لا توجد قصص حالياً</h2>
+            <p className="text-slate-400">ابدأ بإضافة قصة جديدة لمشاركة لحظاتك</p>
           </div>
         )}
       </div>

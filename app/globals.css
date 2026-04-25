@@ -58,7 +58,7 @@
 @layer base {
   * { @apply border-border; }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-slate-50 text-slate-900;
     font-family: 'Segoe UI', 'Cairo', 'Tajawal', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
@@ -80,18 +80,18 @@
 
 /* Glassmorphism */
 .glass-effect {
-  @apply bg-white/10 backdrop-blur-2xl border border-white/20;
+  @apply bg-white/80 backdrop-blur-2xl border border-white/60 shadow-xl;
 }
 .glass-effect-dark {
-  @apply bg-black/40 backdrop-blur-2xl border border-white/10;
+  @apply bg-white/40 backdrop-blur-2xl border border-white/40 shadow-lg;
 }
 
 .glass-card {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+  @apply bg-white/90 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(124,58,237,0.06)];
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .glass-card:hover {
-  @apply border-white/20 bg-white/10;
+  @apply border-white/80 bg-white shadow-[0_15px_40px_rgb(124,58,237,0.12)];
   transform: translateY(-5px) scale(1.01);
 }
 
@@ -141,7 +141,7 @@
 }
 
 .btn-arabgram {
-  @apply relative overflow-hidden px-8 py-4 rounded-2xl font-bold text-white transition-all duration-300 shadow-xl;
+  @apply relative overflow-hidden px-8 py-4 rounded-2xl font-bold text-white transition-all duration-300 shadow-[0_10px_20px_rgb(236,72,153,0.3)];
   background: var(--brand-gradient);
 }
 .btn-arabgram:hover {
@@ -168,7 +168,7 @@
 
 /* Background Blobs */
 .bg-blob {
-  @apply absolute rounded-full blur-[120px] opacity-20 animate-blob;
+  @apply absolute rounded-full blur-[100px] opacity-40 animate-blob mix-blend-multiply;
   z-index: -1;
 }
 
@@ -179,5 +179,5 @@
 
 /* Input Fields */
 .arabgram-input {
-  @apply w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-300;
+  @apply w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-brand-primary/20 focus:border-brand-primary transition-all duration-300 shadow-sm;
 }

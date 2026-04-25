@@ -47,10 +47,10 @@ export default function SearchPage() {
     <div className="max-w-3xl mx-auto pb-24 pt-24 px-4" dir="rtl">
       {/* Search Header */}
       <div className="mb-10 text-center animate-fade-in">
-        <h1 className="text-4xl font-black text-white mb-4 tracking-tighter">
+        <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter">
           ابحث في <span className="arabgram-text-gradient">ArabGram</span>
         </h1>
-        <p className="text-gray-400 font-medium">اكتشف أصدقاء جدد، ومنشورات مميزة</p>
+        <p className="text-slate-500 font-medium">اكتشف أصدقاء جدد، ومنشورات مميزة</p>
       </div>
 
       {/* Search Bar */}
@@ -62,7 +62,7 @@ export default function SearchPage() {
           </div>
           <input
             placeholder="ابحث هنا..."
-            className="w-full bg-transparent border-none focus:ring-0 text-white text-lg font-medium placeholder:text-gray-500 h-12"
+            className="w-full bg-transparent border-none focus:ring-0 text-slate-900 text-lg font-medium placeholder:text-slate-400 h-12"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -71,14 +71,14 @@ export default function SearchPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-10 bg-white/5 p-2 rounded-2xl border border-white/10 animate-fade-in-up delay-100">
+      <div className="flex gap-2 mb-10 bg-white/50 p-2 rounded-2xl border border-white/60 animate-fade-in-up delay-100 shadow-sm">
         {tabs.map(({ id, icon: Icon, label }) => (
           <button
             key={id}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all duration-300 ${
               tab === id 
                 ? 'arabgram-gradient text-white shadow-lg' 
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-white'
             }`}
             onClick={() => setTab(id)}
           >
@@ -92,18 +92,18 @@ export default function SearchPage() {
       <div className="space-y-4 min-h-[40vh] animate-fade-in-up delay-200">
         {results.length === 0 && !loading ? (
           <div className="text-center py-20">
-            <Search className="h-16 w-16 text-gray-700 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-400 mb-2">لا توجد نتائج</h2>
-            <p className="text-gray-600">حاول البحث بكلمات مختلفة</p>
+            <Search className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-slate-500 mb-2">لا توجد نتائج</h2>
+            <p className="text-slate-400">حاول البحث بكلمات مختلفة</p>
           </div>
         ) : (
           tab === 'users' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {results.map((user, i) => (
                 <Link key={user.id} href={`/profile/${user.username}`}>
-                  <div className="glass-card p-5 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition-colors group">
+                  <div className="glass-card p-5 rounded-2xl flex items-center gap-4 hover:bg-slate-50 transition-colors group">
                     <div className="w-14 h-14 story-ring-active p-[2px] group-hover:scale-110 transition-transform">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-gray-900 border-2 border-black">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-white border-2 border-white shadow-sm">
                         {user.image ? (
                           <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
                         ) : (
@@ -114,8 +114,8 @@ export default function SearchPage() {
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-bold text-white group-hover:text-brand-primary transition-colors text-lg">{user.name}</h3>
-                      <p className="text-sm text-gray-500 font-medium">@{user.username}</p>
+                      <h3 className="font-bold text-slate-900 group-hover:text-brand-primary transition-colors text-lg">{user.name}</h3>
+                      <p className="text-sm text-slate-500 font-medium">@{user.username}</p>
                     </div>
                   </div>
                 </Link>
