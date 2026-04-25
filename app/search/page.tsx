@@ -1,7 +1,7 @@
 'use client'
 
 import { Input } from "@/components/ui/input"
-import { Search, User, Hash, ImageIcon as ImageIconComponent, Loader2 } from "lucide-react"
+import { Search, User, Hash, ImageIcon as ImageIconComponent, Loader2, Heart, MessageCircle } from "lucide-react"
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
