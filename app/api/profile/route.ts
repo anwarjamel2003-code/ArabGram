@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
       username: true,
       image: true,
       bio: true,
-      phoneVerified: true,
       createdAt: true,
       _count: {
         select: {
@@ -38,23 +37,21 @@ export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!(session?.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { name, image, bio, phoneVerified } = await request.json()
+  const { name, image, bio } = await request.json()
 
   const updatedUser = await prisma.user.update({
     where: { id: (session!.user as any).id },
     data: {
       name,
       image,
-      bio,
-      phoneVerified
+      bio
     },
     select: {
       id: true,
       name: true,
       username: true,
       image: true,
-      bio: true,
-      phoneVerified: true
+      bio: true
     }
   })
 

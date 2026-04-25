@@ -13,7 +13,6 @@ interface UserProfile {
   username: string
   image?: string
   bio?: string
-  phoneVerified: boolean
   createdAt: string
   _count: {
     posts: number
@@ -136,11 +135,6 @@ export default function ProfilePage() {
                   )}
                 </div>
               </div>
-              {profile.phoneVerified && (
-                <div className="absolute bottom-2 left-2 bg-emerald-500 p-1.5 rounded-full border-4 border-black shadow-lg" title="حساب موثق">
-                  <ShieldCheck className="h-5 w-5 text-white" />
-                </div>
-              )}
             </div>
 
             {/* Info Section */}
