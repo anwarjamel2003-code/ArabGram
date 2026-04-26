@@ -130,19 +130,39 @@ function MessagesContent() {
 
     const callId = `${[currentUserId, activeChat.id].sort().join('_')}_${Date.now()}`
 
-    // Notify the other user via their personal channel
-    const channel = supabase.channel(`incoming_calls:${activeChat.id}`)
-    await channel.send({
-      type: 'broadcast',
-      event: 'ringing',
-      payload: {
-        callId,
-        callerId: currentUserId,
-        callerName: currentUserName,
-        callerImage: currentUserImage,
-        type,
-      },
-    })
+    try {
+      // ✅ FIX: Must SUBSCRIBE to a channel before you can send broadcasts on it
+      const channel = supabase.channel(`incoming_calls:${activeChat.id}`)
+      
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Subscribe timeout')), 5000)
+        channel.subscribe((status: string) => {
+          if (status === 'SUBSCRIBED') {
+            clearTimeout(timeout)
+            resolve()
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            clearTimeout(timeout)
+            reject(new Error(`Channel error: ${status}`))
+          }
+        })
+      })
+
+      await channel.send({
+        type: 'broadcast',
+        event: 'ringing',
+        payload: {
+          callId,
+          callerId: currentUserId,
+          callerName: currentUserName,
+          callerImage: currentUserImage,
+          type,
+        },
+      })
+
+      // Clean up the channel after sending
+      setTimeout(() => supabase.removeChannel(channel), 3000)
+
+
 
     setActiveCall({
       callId,

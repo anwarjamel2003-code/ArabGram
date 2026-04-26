@@ -4,11 +4,6 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import SimplePeer from 'simple-peer'
 import { useWebRTCSignaling } from './useWebRTCSignaling'
 
-/**
- * WebRTC Hook for ArabGram
- * Handles peer-to-peer audio/video calls with Supabase Realtime Signaling
- */
-
 interface WebRTCConfig {
   callId: string
   userId: string
@@ -20,27 +15,50 @@ interface WebRTCConfig {
   onStream?: (stream: MediaStream) => void
 }
 
+// ✅ FIX: Add free TURN servers (Open Relay) so calls work across networks
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  // Free TURN servers from Open Relay Project (works across different networks/NATs)
+  {
+    urls: 'turn:openrelay.metered.ca:80',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+  {
+    urls: 'turn:openrelay.metered.ca:443',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+  {
+    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+    username: 'openrelayproject',
+    credential: 'openrelayproject',
+  },
+]
+
 export function useWebRTC(config: WebRTCConfig) {
   const peerRef = useRef<SimplePeer.Instance | null>(null)
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const { signals, isConnected: signalingConnected, sendSignal } = useWebRTCSignaling(config.callId, config.userId)
 
-  // Create peer connection
   const createPeer = useCallback(() => {
     try {
+      // Destroy any existing peer first
+      if (peerRef.current) {
+        peerRef.current.destroy()
+        peerRef.current = null
+      }
+
       const peer = new SimplePeer({
         initiator: config.initiator,
         trickle: true,
         stream: config.stream,
         config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' },
-            { urls: 'stun:stun3.l.google.com:19302' },
-            { urls: 'stun:stun4.l.google.com:19302' },
-          ],
+          iceServers: ICE_SERVERS,
+          iceTransportPolicy: 'all',
         },
       })
 
@@ -54,13 +72,13 @@ export function useWebRTC(config: WebRTCConfig) {
       })
 
       peer.on('connect', () => {
-        console.log('[WebRTC] Connected')
+        console.log('[WebRTC] Peer connected!')
         setConnected(true)
         config.onConnect?.()
       })
 
       peer.on('stream', (stream) => {
-        console.log('[WebRTC] Received stream')
+        console.log('[WebRTC] Got remote stream')
         config.onStream?.(stream)
       })
 
@@ -81,20 +99,19 @@ export function useWebRTC(config: WebRTCConfig) {
       setError(error)
       config.onError?.(error)
     }
-  }, [config, sendSignal])
+  }, [config.initiator, config.stream, config.otherUserId, sendSignal])
 
-  // Initialize peer
   useEffect(() => {
     if (signalingConnected) {
       createPeer()
     }
-
     return () => {
       if (peerRef.current) {
         peerRef.current.destroy()
+        peerRef.current = null
       }
     }
-  }, [createPeer, signalingConnected])
+  }, [signalingConnected])
 
   // Handle incoming signals
   useEffect(() => {
@@ -103,7 +120,7 @@ export function useWebRTC(config: WebRTCConfig) {
         try {
           peerRef.current.signal(signal.data)
         } catch (err) {
-          console.error('[WebRTC] Signal error:', err)
+          console.error('[WebRTC] Signal processing error:', err)
         }
       }
     })
@@ -117,33 +134,18 @@ export function useWebRTC(config: WebRTCConfig) {
     }
   }, [])
 
-  return {
-    peer: peerRef.current,
-    connected,
-    error,
-    signalingConnected,
-    close,
-  }
+  return { peer: peerRef.current, connected, error, signalingConnected, close }
 }
 
-/**
- * Get user media stream (audio/video)
- */
 export async function getUserMedia(constraints: MediaStreamConstraints = { audio: true, video: true }) {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints)
-    return stream
+    return await navigator.mediaDevices.getUserMedia(constraints)
   } catch (error) {
     console.error('[Media] Error:', error)
     throw error
   }
 }
 
-/**
- * Stop all tracks in a stream
- */
 export function stopStream(stream: MediaStream) {
-  stream.getTracks().forEach((track) => {
-    track.stop()
-  })
+  stream.getTracks().forEach((track) => track.stop())
 }
