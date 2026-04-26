@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { Heart } from 'lucide-react'
 
 export default function Home() {
   return (
