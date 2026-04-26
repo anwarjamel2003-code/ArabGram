@@ -2,8 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Heart, MessageCircle, UserPlus, Share2, Bell, Loader2 } from 'lucide-react'
-import Image from 'next/image'
+import { Loader2 } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, CHANNELS } from '@/lib/supabase'
 
@@ -68,12 +67,8 @@ export default function Notifications() {
 
   if (status === 'unauthenticated') {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="text-center glass-card p-12 rounded-[3rem] animate-float">
-          <Bell className="h-16 w-16 text-zinc-600 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">يجب تسجيل الدخول</h1>
-          <p className="text-zinc-400 font-medium text-sm">قم بتسجيل الدخول لمعرفة من تفاعل معك.</p>
-        </div>
+      <div className="h-screen flex flex-col items-center justify-center p-4">
+        <h1 className="text-4xl font-black text-zinc-600 tracking-widest uppercase">الوصول مقيد</h1>
       </div>
     )
   }
@@ -83,83 +78,46 @@ export default function Notifications() {
   }
 
   return (
-    <div className="max-w-[700px] mx-auto pt-8 pb-20 px-4" dir="rtl">
+    <div className="min-h-screen w-full max-w-[1200px] mx-auto px-6 py-20 relative z-10" dir="rtl">
       
-      <div className="mb-10 text-center">
-        <h1 className="text-4xl font-black text-white mb-2 tracking-wide">الإشعارات</h1>
-        <p className="text-zinc-500 font-medium">تابع تفاعلات المتابعين معك أولاً بأول</p>
-      </div>
+      <h1 className="text-7xl md:text-9xl font-black text-white/5 tracking-tighter mb-20 select-none uppercase">التنبيهات.</h1>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-10 w-10 text-pink-500 animate-spin" />
+        <div className="py-20 flex justify-center">
+          <Loader2 className="h-12 w-12 text-white animate-spin opacity-50" />
         </div>
       ) : notifications.length === 0 ? (
-        <div className="text-center py-20 glass-card rounded-[3rem]">
-          <div className="w-20 h-20 arabgram-gradient rounded-full flex items-center justify-center mx-auto mb-6 p-[2px]">
-            <div className="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center">
-              <Heart className="h-10 w-10 text-white" />
-            </div>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">لا توجد إشعارات حالياً</h2>
-          <p className="text-zinc-500 font-medium text-sm">عندما يعجب شخص ما أو يعلق على أحد منشوراتك، سيظهر ذلك هنا.</p>
+        <div className="text-right py-20">
+          <h2 className="text-5xl font-black text-zinc-600">لا يوجد ترددات جديدة.</h2>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="space-y-6">
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`glass-card p-5 rounded-[2rem] flex items-center gap-5 cursor-pointer hover:bg-white/10 transition-all ${
-                !notification.read ? 'border-pink-500/50 shadow-[0_5px_20px_rgba(220,20,90,0.15)]' : 'border-white/5'
+              className={`flex items-center gap-8 p-8 rounded-[2rem] cursor-pointer transition-all duration-500 ${
+                !notification.read ? 'bg-white text-zinc-950 scale-[1.02] shadow-[0_20px_50px_rgba(255,255,255,0.1)]' : 'hover:bg-white/5 text-white'
               }`}
               onClick={() => {
                 markAsRead(notification.id)
                 if (notification.actionUrl) router.push(notification.actionUrl)
               }}
             >
-              {/* Avatar Indicator */}
-              <div className="relative flex-shrink-0">
-                <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-800 border border-white/10 relative z-10">
-                  {notification.actorImage ? (
-                    <Image
-                      src={notification.actorImage}
-                      alt=""
-                      width={56}
-                      height={56}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center arabgram-gradient text-white font-bold text-lg">
-                      {notification.actorInitials || '?'}
-                    </div>
-                  )}
-                </div>
-                {/* Notification Type Icon */}
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-zinc-900 border-2 border-zinc-900 flex items-center justify-center z-20">
-                  {notification.type === 'like' && <Heart className="h-3 w-3 fill-pink-500 text-pink-500" />}
-                  {notification.type === 'comment' && <MessageCircle className="h-3 w-3 fill-blue-500 text-blue-500" />}
-                  {notification.type === 'follow' && <UserPlus className="h-3 w-3 text-emerald-500" />}
-                </div>
-              </div>
+              <span className={`text-6xl font-black opacity-20 hidden md:block ${!notification.read ? 'text-pink-500' : 'text-white'}`}>
+                {notification.type === 'like' ? '♡' : notification.type === 'comment' ? '💬' : '⚑'}
+              </span>
 
-              <div className="flex-1 min-w-0">
-                <div className="text-[15px] leading-relaxed">
-                  <span className="font-bold text-white">{notification.actorUsername || notification.actorInitials}</span>
-                  <span className="text-zinc-300 ml-1"> {notification.message}</span>
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-zinc-500 text-[13px] font-bold">{notification.time}</span>
-                  {!notification.read && (
-                    <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-                  )}
-                </div>
+              <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <p className="text-2xl md:text-3xl font-black tracking-wide leading-tight">
+                  <span className={!notification.read ? 'arabgram-text-gradient' : 'text-zinc-400'}>
+                    {notification.actorUsername || notification.actorInitials}
+                  </span>
+                  {' '}{notification.message}
+                </p>
+                <span className={`text-sm font-bold uppercase tracking-widest ${!notification.read ? 'text-zinc-500' : 'text-zinc-600'}`}>
+                  {notification.time}
+                </span>
               </div>
-
-              {notification.type === 'follow' && (
-                <button className="btn-primary !px-5 !py-2 !text-sm flex-shrink-0">
-                  متابعة
-                </button>
-              )}
             </div>
           ))}
         </div>

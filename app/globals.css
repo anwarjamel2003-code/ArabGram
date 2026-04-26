@@ -7,53 +7,25 @@
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    
-    --radius: 1rem;
-    
-    /* Modern Logo Colors */
+    /* extracted logo colors */
     --brand-orange: #fa9628;
     --brand-pink: #dc145a;
     --brand-blue: #2850e6;
     
-    /* The stunning brand gradient */
     --brand-gradient: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-pink) 50%, var(--brand-blue) 100%);
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-white/10;
   }
   body {
-    @apply bg-zinc-950 text-foreground antialiased selection:bg-pink-500/30 selection:text-white;
+    @apply bg-zinc-950 text-white antialiased overflow-x-hidden selection:bg-pink-500/30 selection:text-white;
   }
 }
 
-/* Modern Utilities */
+/* Avant-Garde Utilities */
 .arabgram-text-gradient {
   background: var(--brand-gradient);
   -webkit-background-clip: text;
@@ -65,57 +37,57 @@
   background: var(--brand-gradient);
 }
 
-.glass-card {
-  @apply bg-zinc-900/40 backdrop-blur-xl border border-white/5 shadow-2xl;
+.glass-panel {
+  @apply bg-white/[0.02] backdrop-blur-[40px] border border-white/[0.05];
 }
 
-.glass-navbar {
-  @apply bg-zinc-950/70 backdrop-blur-2xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)];
-}
-
-.story-ring-active {
-  background: var(--brand-gradient);
-  padding: 3px;
-  border-radius: 50%;
-}
-
-.btn-primary {
-  background: var(--brand-gradient);
-  @apply text-white font-bold py-2.5 px-6 rounded-2xl shadow-lg hover:shadow-pink-500/25 transition-all hover:-translate-y-0.5 active:translate-y-0;
-}
-
-.btn-secondary {
-  @apply bg-zinc-800 hover:bg-zinc-700 border border-white/5 text-white font-bold py-2.5 px-6 rounded-2xl transition-all;
-}
-
-.modern-input {
-  @apply w-full bg-zinc-900/50 border border-white/10 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:border-pink-500/50 focus:ring-1 focus:ring-pink-500/50 transition-all placeholder:text-zinc-500;
-}
-
-/* Hide scrollbar */
-.no-scrollbar::-webkit-scrollbar {
+/* Hide scrollbars for aesthetic */
+::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
+* {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-/* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* Masonry Grid (CSS Columns) */
+.masonry-grid {
+  column-count: 1;
+  column-gap: 1.5rem;
+}
+@media (min-width: 640px) { .masonry-grid { column-count: 2; } }
+@media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
+@media (min-width: 1536px) { .masonry-grid { column-count: 4; } }
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+/* Fluid Liquid Animations */
+@keyframes blob1 {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes blob2 {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-50px, 30px) scale(0.9); }
+  66% { transform: translate(20px, -20px) scale(1.1); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-}
+.animate-blob1 { animation: blob1 15s infinite alternate ease-in-out; }
+.animate-blob2 { animation: blob2 18s infinite alternate-reverse ease-in-out; }
 
-.animate-pulse-glow {
-  animation: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Micro-animations */
+.hover-reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .hover-reveal {
+  opacity: 1;
+  transform: translateY(0);
 }
