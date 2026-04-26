@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
 import { Loader2, Radio, Globe, SendHorizontal, Phone, Video, X } from 'lucide-react'
@@ -133,7 +134,7 @@ function MessagesContent() {
     try {
       // ✅ FIX: Must SUBSCRIBE to a channel before you can send broadcasts on it
       const channel = supabase.channel(`incoming_calls:${activeChat.id}`)
-      
+
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('Subscribe timeout')), 5000)
         channel.subscribe((status: string) => {
@@ -162,16 +163,17 @@ function MessagesContent() {
       // Clean up the channel after sending
       setTimeout(() => supabase.removeChannel(channel), 3000)
 
-
-
-    setActiveCall({
-      callId,
-      otherUserId: activeChat.id,
-      otherUserName: activeChat.name,
-      otherUserImage: activeChat.image,
-      type,
-      initiator: true,
-    })
+      setActiveCall({
+        callId,
+        otherUserId: activeChat.id,
+        otherUserName: activeChat.name,
+        otherUserImage: activeChat.image,
+        type,
+        initiator: true,
+      })
+    } catch (error) {
+      console.error('Failed to start call', error)
+    }
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -366,10 +368,9 @@ function MessagesContent() {
   )
 }
 
-// ─── Inline Video Call Overlay (Avant-Garde Style) ───────────────────────────
-import dynamic from 'next/dynamic'
 const VideoCall = dynamic(() => import('@/components/VideoCall'), { ssr: false })
 
+// ─── Inline Video Call Overlay (Avant-Garde Style) ───────────────────────────
 function VideoCallOverlay({ call, currentUserId, onEnd }: {
   call: ActiveCall
   currentUserId: string
