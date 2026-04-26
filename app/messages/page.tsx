@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useSession } from 'next-auth/react'
-import { MessageCircle, Search, Phone, Video, Send, Loader2, Info } from 'lucide-react'
+import { MessageCircle, Search, Phone, Video, Send, Loader2, Info, Smile } from 'lucide-react'
 import { useRealtimeChat } from '@/hooks/useRealtimeChat'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
