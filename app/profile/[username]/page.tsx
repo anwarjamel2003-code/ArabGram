@@ -72,7 +72,6 @@ export default function ProfilePage() {
       if (res.ok) {
         const { count, isFollowing } = await res.json()
         setFollowersCount(count)
-        // If API returns whether current user follows this profile
         if (isFollowing !== undefined) setFollowing(isFollowing)
       }
     } else if (profile) {
@@ -106,7 +105,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[70vh]">
-        <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+        <Loader2 className="h-10 w-10 text-pink-500 animate-spin" />
       </div>
     )
   }
@@ -114,117 +113,133 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
-        <h2 className="text-xl font-semibold mb-2">عذراً، هذه الصفحة غير متوفرة.</h2>
-        <p className="text-sm text-slate-500 mb-6">قد يكون الرابط الذي اتبعته معطلاً، أو ربما تمت إزالة الصفحة.</p>
-        <Link href="/feed" className="text-brand-primary font-semibold text-sm">العودة إلى ArabGram.</Link>
+        <div className="glass-card p-12 rounded-[3rem] animate-float">
+          <User className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">عذراً، هذه الصفحة غير متوفرة.</h2>
+          <p className="text-sm text-zinc-400 mb-6 font-medium">قد يكون الرابط الذي اتبعته معطلاً، أو ربما تمت إزالة الصفحة.</p>
+          <Link href="/feed" className="btn-primary inline-block">العودة إلى الرئيسية</Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[935px] mx-auto pt-8 pb-20 px-4 md:px-5" dir="rtl">
+    <div className="max-w-[900px] mx-auto pt-8 pb-24 px-4 md:px-8" dir="rtl">
       
-      {/* Profile Header */}
-      <div className="flex flex-col md:flex-row mb-11">
-        {/* Avatar */}
-        <div className="flex justify-center md:justify-start md:mr-10 md:w-1/3 mb-6 md:mb-0">
-          <div className="w-[150px] h-[150px] md:w-[150px] md:h-[150px] story-ring-seen">
-            <div className="w-full h-full rounded-full border-4 border-white overflow-hidden bg-slate-100 flex items-center justify-center">
-              {profile.image ? (
-                <img src={profile.image} alt={profile.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-5xl font-light text-slate-400">{profile.name?.[0]}</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Info */}
-        <div className="md:w-2/3 flex flex-col items-center md:items-start text-center md:text-right">
+      {/* Profile Header (Modern Glass Bento Style) */}
+      <div className="glass-card rounded-[3rem] p-6 md:p-10 mb-10 relative overflow-hidden border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        {/* Subtle background glow based on brand gradient */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] arabgram-gradient opacity-10 blur-[100px] rounded-full pointer-events-none transform translate-x-1/2 -translate-y-1/2" />
+        
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 relative z-10">
           
-          <div className="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-5">
-            <h1 className="text-xl leading-5">{profile.username}</h1>
-            <div className="flex gap-2 items-center">
-              {isOwnProfile ? (
-                <>
-                  <EditProfileModal user={profile} onUpdate={fetchProfile} />
-                  <button className="text-slate-900 px-2 py-1 hover:bg-slate-50 rounded-md transition-colors">
-                    <Settings className="w-6 h-6" />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button 
-                    onClick={handleFollow}
-                    className={`font-semibold px-4 py-1.5 rounded-lg text-sm transition-colors ${
-                      following 
-                        ? 'bg-[#efefef] hover:bg-[#dbdbdb] text-black' 
-                        : 'bg-[#0095f6] hover:bg-[#1877f2] text-white'
-                    }`}
-                  >
-                    {following ? 'متابَع' : 'متابعة'}
-                  </button>
-                  <button 
-                    onClick={handleMessage}
-                    className="font-semibold px-4 py-1.5 rounded-lg text-sm bg-[#efefef] hover:bg-[#dbdbdb] text-black transition-colors"
-                  >
-                    مراسلة
-                  </button>
-                </>
-              )}
+          {/* Avatar with glowing ring */}
+          <div className="flex-shrink-0 relative group">
+            <div className="absolute inset-0 arabgram-gradient rounded-full blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative w-[140px] h-[140px] md:w-[160px] md:h-[160px] rounded-full p-1 arabgram-gradient">
+              <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center overflow-hidden border-4 border-zinc-950">
+                {profile.image ? (
+                  <img src={profile.image} alt={profile.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-6xl font-bold arabgram-text-gradient">{profile.name?.[0]}</span>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="hidden md:flex gap-10 mb-5 text-base">
-            <div><span className="font-semibold">{profile._count.posts}</span> منشورات</div>
-            <div className="cursor-pointer"><span className="font-semibold">{followersCount}</span> متابع</div>
-            <div className="cursor-pointer"><span className="font-semibold">{profile._count.following}</span> يتابع</div>
-          </div>
+          {/* Info Section */}
+          <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-right w-full">
+            
+            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-6 mb-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-black text-white mb-2">{profile.name}</h1>
+                <span className="text-pink-500 font-bold text-lg">@{profile.username}</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                {isOwnProfile ? (
+                  <>
+                    <EditProfileModal user={profile} onUpdate={fetchProfile} />
+                    <button className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white transition-all shadow-lg hover:shadow-white/5">
+                      <Settings className="w-5 h-5" />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={handleFollow}
+                      className={`btn-primary shadow-[0_10px_20px_rgba(220,20,90,0.2)] hover:shadow-[0_10px_25px_rgba(220,20,90,0.4)] ${
+                        following ? '!bg-white/10 !text-white !shadow-none border border-white/20' : ''
+                      }`}
+                    >
+                      {following ? 'متابَع' : 'متابعة'}
+                    </button>
+                    <button 
+                      onClick={handleMessage}
+                      className="p-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl text-white transition-all shadow-lg"
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
 
-          <div className="text-sm">
-            <span className="font-semibold block">{profile.name}</span>
-            {profile.bio && <p className="whitespace-pre-wrap mt-1">{profile.bio}</p>}
-          </div>
+            {profile.bio && (
+              <p className="text-zinc-300 font-medium text-[15px] leading-relaxed max-w-xl mb-8">
+                {profile.bio}
+              </p>
+            )}
 
+            {/* Stats Bento Grid */}
+            <div className="grid grid-cols-3 gap-3 w-full max-w-md">
+              <div className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col items-center justify-center hover:bg-white/10 transition-colors">
+                <span className="text-2xl font-black text-white mb-1">{profile._count.posts}</span>
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">منشور</span>
+              </div>
+              <div className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col items-center justify-center hover:bg-white/10 transition-colors cursor-pointer">
+                <span className="text-2xl font-black text-white mb-1">{followersCount}</span>
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">متابع</span>
+              </div>
+              <div className="bg-white/5 border border-white/5 rounded-2xl p-4 flex flex-col items-center justify-center hover:bg-white/10 transition-colors cursor-pointer">
+                <span className="text-2xl font-black text-white mb-1">{profile._count.following}</span>
+                <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">يتابع</span>
+              </div>
+            </div>
+
+          </div>
         </div>
-      </div>
-
-      {/* Mobile Stats */}
-      <div className="md:hidden flex justify-around border-t border-slate-200 py-3 text-sm text-center">
-        <div className="flex flex-col"><span className="font-semibold">{profile._count.posts}</span><span className="text-slate-500">منشورات</span></div>
-        <div className="flex flex-col"><span className="font-semibold">{followersCount}</span><span className="text-slate-500">متابع</span></div>
-        <div className="flex flex-col"><span className="font-semibold">{profile._count.following}</span><span className="text-slate-500">يتابع</span></div>
       </div>
 
       {/* Tabs */}
-      <div className="border-t border-slate-200 flex justify-center gap-12">
-        <div className="flex items-center gap-2 py-4 border-t border-black -mt-[1px] text-xs font-semibold tracking-widest text-black">
-          <Grid className="w-3 h-3" /> منشورات
-        </div>
+      <div className="flex justify-center gap-4 mb-8">
+        <button className="px-6 py-3 rounded-2xl font-bold text-sm arabgram-gradient text-white shadow-lg shadow-pink-500/25 flex items-center gap-2">
+          <Grid className="w-4 h-4" /> المنشورات
+        </button>
         {isOwnProfile && (
-          <div className="flex items-center gap-2 py-4 text-xs font-semibold tracking-widest text-slate-500 cursor-pointer">
-            <Bookmark className="w-3 h-3" /> محفوظات
-          </div>
+          <button className="px-6 py-3 rounded-2xl font-bold text-sm bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white transition-colors flex items-center gap-2">
+            <Bookmark className="w-4 h-4" /> المحفوظات
+          </button>
         )}
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-3 gap-1 md:gap-7">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {posts.map((post: any) => (
           <div 
             key={post.id} 
-            className="aspect-square relative group cursor-pointer bg-slate-100"
+            className="aspect-square relative group cursor-pointer rounded-3xl overflow-hidden border border-white/10 bg-zinc-900"
             onClick={() => router.push(`/post/${post.id}`)}
           >
-            <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
+            <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-6">
-              <div className="flex items-center gap-2 text-white font-bold">
-                <Heart className="w-6 h-6 fill-white stroke-transparent" /> {post._count?.likes || 0}
+            {/* Modern Hover Overlay */}
+            <div className="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-6">
+              <div className="flex items-center gap-2 text-white font-black text-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <Heart className="w-7 h-7 fill-pink-500 text-pink-500" /> {post._count?.likes || 0}
               </div>
-              <div className="flex items-center gap-2 text-white font-bold">
-                <MessageCircle className="w-6 h-6 fill-white stroke-transparent" /> {post._count?.comments || 0}
+              <div className="flex items-center gap-2 text-white font-black text-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                <MessageCircle className="w-7 h-7 fill-blue-500 text-blue-500" /> {post._count?.comments || 0}
               </div>
             </div>
           </div>
@@ -232,11 +247,12 @@ export default function ProfilePage() {
       </div>
 
       {posts.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-16 h-16 rounded-full border-2 border-slate-900 flex items-center justify-center mb-4">
-            <ImageIcon className="w-8 h-8 text-slate-900" />
+        <div className="flex flex-col items-center justify-center py-20 text-center glass-card rounded-[3rem]">
+          <div className="w-20 h-20 rounded-full border border-white/10 bg-white/5 flex items-center justify-center mb-6">
+            <ImageIcon className="w-10 h-10 text-zinc-500" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">لا توجد منشورات بعد</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">لا توجد منشورات بعد</h2>
+          <p className="text-zinc-500 font-medium text-sm">شارك أجمل لحظاتك مع أصدقائك</p>
         </div>
       )}
 

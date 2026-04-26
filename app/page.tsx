@@ -3,100 +3,127 @@ import Image from 'next/image'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden" dir="rtl">
       
-      <div className="flex max-w-[850px] w-full gap-8 items-center justify-center">
+      {/* Dynamic Background Effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] arabgram-gradient rounded-full blur-[120px] opacity-20 animate-pulse-glow pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-blue-600 rounded-full blur-[100px] opacity-20 pointer-events-none" />
+      
+      {/* Decorative Grid */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none" />
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col lg:flex-row items-center justify-center max-w-[1400px] mx-auto w-full px-6 py-12 lg:py-0 gap-12 lg:gap-24 relative z-10">
         
-        {/* Left Side (RTL) - Phone Mockup (Hidden on mobile) */}
-        <div className="hidden md:block w-[380px] h-[581px] relative bg-[url('https://static.cdninstagram.com/images/instagram/xig/homepage/phones/home-phones.png?__makehaste_cache_breaker=HOgRclNOosk')] bg-no-repeat bg-[length:468.32px_634.15px] bg-[-46px_0]">
-          {/* We can put an image slider here if we want to perfectly replicate IG, but a static image is fine */}
-          <div className="absolute top-[27px] right-[112.5px]">
-            <div className="w-[250px] h-[538px] bg-slate-200">
-               <Image 
-                 src="/arabgram-logo.png" 
-                 alt="App Screenshot" 
-                 width={250} 
-                 height={538} 
-                 className="w-full h-full object-cover"
-               />
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side (RTL) - Auth Box */}
-        <div className="w-full max-w-[350px] flex flex-col gap-3">
+        {/* Right Side (RTL) - Hero Text & Auth */}
+        <div className="w-full lg:w-1/2 flex flex-col justify-center text-center lg:text-right pt-20 lg:pt-0">
           
-          <div className="bg-white border border-slate-300 p-10 flex flex-col items-center">
-            <h1 className="text-4xl font-serif italic font-bold mb-10 mt-4 tracking-wider">ArabGram</h1>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border-white/10 w-fit mx-auto lg:mx-0 mb-8">
+            <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
+            <span className="text-sm font-bold text-white tracking-widest uppercase">الجيل الجديد من التواصل</span>
+          </div>
+
+          <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-tight mb-6 tracking-tight">
+            عالمك <br />
+            <span className="arabgram-text-gradient">أكثر إشراقاً</span>
+          </h1>
+          
+          <p className="text-lg sm:text-xl text-zinc-400 font-medium leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
+            اكتشف طريقة جديدة للتواصل ومشاركة لحظاتك مع أصدقائك. انضم إلى المجتمع الأسرع نمواً في العالم العربي الآن.
+          </p>
+
+          {/* Auth Card */}
+          <div className="glass-card rounded-[2.5rem] p-8 max-w-md mx-auto lg:mx-0 w-full relative group">
+            <div className="absolute inset-0 arabgram-gradient opacity-0 group-hover:opacity-10 rounded-[2.5rem] transition-opacity duration-500" />
             
-            <form className="w-full flex flex-col gap-2 mb-4">
-              <input 
-                type="text" 
-                placeholder="رقم الهاتف، اسم المستخدم أو البريد الإلكتروني" 
-                className="w-full bg-[#fafafa] border border-slate-300 rounded-[3px] px-2 py-2 text-xs focus:outline-none focus:border-slate-400"
-              />
-              <input 
-                type="password" 
-                placeholder="كلمة السر" 
-                className="w-full bg-[#fafafa] border border-slate-300 rounded-[3px] px-2 py-2 text-xs focus:outline-none focus:border-slate-400"
-              />
-              <Link href="/auth/signin" className="w-full">
-                <button type="button" className="w-full bg-[#0095f6] hover:bg-[#1877f2] text-white font-semibold rounded-lg py-1.5 mt-3 text-sm transition-colors">
-                  تسجيل الدخول
-                </button>
+            <div className="flex flex-col gap-4 relative z-10">
+              <Link href="/auth/signup" className="btn-primary w-full text-center text-lg py-4">
+                ابدأ رحلتك مجاناً
               </Link>
-            </form>
-
-            <div className="w-full flex items-center gap-4 my-4">
-              <div className="h-[1px] bg-slate-300 flex-1"></div>
-              <span className="text-slate-500 font-semibold text-[13px]">أو</span>
-              <div className="h-[1px] bg-slate-300 flex-1"></div>
-            </div>
-
-            <Link href="/auth/signin" className="flex items-center gap-2 text-[#385185] font-semibold text-sm mb-4 mt-2">
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              تسجيل الدخول بحساب فيسبوك
-            </Link>
-
-            <Link href="/auth/forgot" className="text-[#00376b] text-xs mt-2">
-              هل نسيت كلمة السر؟
-            </Link>
-          </div>
-
-          <div className="bg-white border border-slate-300 p-6 flex items-center justify-center text-sm">
-            <span>ليس لديك حساب؟</span>
-            <Link href="/auth/signup" className="text-[#0095f6] font-semibold mr-1">
-              تسجيل
-            </Link>
-          </div>
-
-          <div className="text-center mt-2 text-sm">
-            <p className="mb-4">احصل على التطبيق.</p>
-            <div className="flex justify-center gap-2">
-              <img src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png" alt="Get it on Google Play" className="h-10 cursor-pointer" />
-              <img src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png" alt="Download on the App Store" className="h-10 cursor-pointer" />
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-white/10"></div>
+                <span className="flex-shrink-0 mx-4 text-zinc-500 font-medium text-sm">أو</span>
+                <div className="flex-grow border-t border-white/10"></div>
+              </div>
+              <Link href="/auth/signin" className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold rounded-2xl py-4 text-center transition-all text-lg">
+                تسجيل الدخول
+              </Link>
             </div>
           </div>
-
         </div>
-      </div>
-      
-      {/* Footer */}
-      <footer className="absolute bottom-4 w-full text-center text-xs text-slate-500 flex flex-wrap justify-center gap-x-4 gap-y-2 px-4">
-        <Link href="#">Meta</Link>
-        <Link href="#">حول</Link>
-        <Link href="#">المدونة</Link>
-        <Link href="#">الوظائف</Link>
-        <Link href="#">مساعدة</Link>
-        <Link href="#">واجهة برمجة التطبيقات</Link>
-        <Link href="#">الخصوصية</Link>
-        <Link href="#">الشروط</Link>
-        <Link href="#">المواقع</Link>
-        <Link href="#">Instagram Lite</Link>
-        <Link href="#">Threads</Link>
-        <div className="w-full mt-2">
-          <span>العربية</span>
-          <span className="mx-2">© 2026 ArabGram من Meta (افتراضي)</span>
+
+        {/* Left Side (RTL) - Floating App Mockup */}
+        <div className="hidden lg:flex w-1/2 relative h-[800px] items-center justify-center perspective-[2000px]">
+          {/* Main Floating Card */}
+          <div className="relative w-[380px] h-[750px] bg-zinc-950 rounded-[3rem] border-8 border-zinc-900 shadow-[0_0_50px_rgba(220,20,90,0.3)] overflow-hidden transform rotate-y-[-15deg] rotate-x-[5deg] animate-float z-20">
+            {/* Mockup Header */}
+            <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-zinc-900 to-transparent z-10 flex items-start justify-between p-6">
+              <span className="text-2xl font-black arabgram-text-gradient italic">ArabGram</span>
+            </div>
+            
+            {/* Mockup Content (Fake Feed) */}
+            <div className="pt-24 px-4 space-y-6">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-zinc-900/80 rounded-3xl p-4 border border-white/5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full arabgram-gradient" />
+                    <div className="h-4 w-24 bg-zinc-800 rounded-full" />
+                  </div>
+                  <div className="w-full aspect-square bg-zinc-800 rounded-2xl mb-4 relative overflow-hidden">
+                    <div className="absolute inset-0 arabgram-gradient opacity-20" />
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="w-8 h-8 rounded-full bg-zinc-800" />
+                    <div className="w-8 h-8 rounded-full bg-zinc-800" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Floating Element 1 */}
+          <div className="absolute top-1/4 -right-12 w-48 h-48 glass-card rounded-3xl border border-white/10 p-4 transform rotate-12 animate-float shadow-2xl z-30 flex flex-col justify-between" style={{ animationDelay: '1s' }}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full arabgram-gradient flex items-center justify-center">
+                <Heart className="w-5 h-5 text-white fill-white" />
+              </div>
+              <div className="space-y-1">
+                <div className="h-2 w-16 bg-zinc-700 rounded-full" />
+                <div className="h-2 w-10 bg-zinc-800 rounded-full" />
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-3xl font-black text-white">+12k</span>
+              <p className="text-xs text-zinc-500 font-bold">تسجيل إعجاب جديد</p>
+            </div>
+          </div>
+
+          {/* Floating Element 2 */}
+          <div className="absolute bottom-1/4 -left-12 w-56 h-32 glass-card rounded-3xl border border-white/10 p-4 transform -rotate-6 animate-float shadow-2xl z-30 flex items-center gap-4" style={{ animationDelay: '2s' }}>
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full border-2 border-zinc-900 bg-pink-500 z-20 relative" />
+              <div className="w-12 h-12 rounded-full border-2 border-zinc-900 bg-blue-500 absolute top-0 -right-6 z-10" />
+              <div className="w-12 h-12 rounded-full border-2 border-zinc-900 bg-orange-500 absolute top-0 -right-12 z-0" />
+            </div>
+            <div>
+              <span className="text-xl font-black text-white block">مجتمع نابض</span>
+              <span className="text-xs text-zinc-400">شارك أفكارك</span>
+            </div>
+          </div>
+        </div>
+
+      </main>
+
+      {/* Modern Footer */}
+      <footer className="w-full border-t border-white/5 bg-zinc-950/50 backdrop-blur-md relative z-10">
+        <div className="max-w-[1400px] mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-6 text-sm font-bold text-zinc-500">
+            <Link href="#" className="hover:text-white transition-colors">حول</Link>
+            <Link href="#" className="hover:text-white transition-colors">الخصوصية</Link>
+            <Link href="#" className="hover:text-white transition-colors">الشروط</Link>
+          </div>
+          <span className="text-sm font-bold text-zinc-600">© 2026 ArabGram. جميع الحقوق محفوظة.</span>
         </div>
       </footer>
     </div>

@@ -21,9 +21,9 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={inter.className}>
         <Providers>
-          <main className="min-h-screen bg-background text-foreground">
+          <main className="min-h-screen bg-zinc-950 text-white flex flex-col">
             <Navigation />
-            <div className="md:pr-64 pb-16 md:pb-0">
+            <div className="pt-20 flex-1">
               <div className="w-full">
                 {children}
               </div>
