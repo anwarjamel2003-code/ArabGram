@@ -73,8 +73,21 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/signin',
   },
   session: {
-    strategy: 'jwt',       // JWT works with CredentialsProvider (database doesn't!)
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    strategy: 'jwt',
+    maxAge: 365 * 24 * 60 * 60,  // 1 year — persistent session
+    updateAge: 24 * 60 * 60,      // Refresh token every 24h automatically
+  },
+  cookies: {
+    sessionToken: {
+      name: 'arabgram.session',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 365 * 24 * 60 * 60,  // 1 year cookie
+      },
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
