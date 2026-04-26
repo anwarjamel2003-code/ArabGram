@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Heart } from 'lucide-react'
 
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden" dir="rtl">

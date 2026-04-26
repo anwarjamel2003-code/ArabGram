@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Shield, Loader2 } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function SignIn() {
@@ -44,135 +44,105 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Dynamic Background Elements */}
-      <div className="bg-blob w-[500px] h-[500px] bg-brand-primary top-[-10%] left-[-10%]" />
-      <div className="bg-blob w-[400px] h-[400px] bg-brand-secondary bottom-[-10%] right-[-10%] delay-700" />
-      <div className="bg-blob w-[300px] h-[300px] bg-brand-accent top-[40%] right-[10%] delay-1000" />
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden" dir="rtl">
 
-      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
-        {/* Logo Section */}
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-6">
-            <div className="relative group">
-              <div className="absolute inset-0 arabgram-gradient blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500 animate-pulse-soft" />
-              <div className="relative overflow-hidden rounded-[3.5rem] p-[4px] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-                <div className="absolute inset-0 arabgram-gradient animate-spin-slow" />
-                <div className="relative bg-white rounded-[3.3rem] p-4 shadow-xl">
-                  <Image
-                    src="/arabgram-logo.png"
-                    alt="ArabGram"
-                    width={180}
-                    height={180}
-                    className="rounded-3xl object-contain"
-                    priority
-                  />
+      {/* Liquid Background Blobs */}
+      <div className="absolute top-[10%] left-[20%] w-[40vw] h-[40vw] bg-[#fa9628] rounded-full mix-blend-screen filter blur-[150px] opacity-10 animate-blob1 pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[10%] w-[30vw] h-[30vw] bg-[#2850e6] rounded-full mix-blend-screen filter blur-[120px] opacity-10 animate-blob2 pointer-events-none" />
+      <div className="absolute top-[50%] right-[30%] w-[25vw] h-[25vw] bg-[#dc145a] rounded-full mix-blend-screen filter blur-[130px] opacity-10 animate-blob1 pointer-events-none" />
+
+      {/* Grid overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+
+      <div className="w-full max-w-lg relative z-10">
+
+        {/* Logo */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-8">
+            <div className="relative">
+              <div className="absolute inset-0 arabgram-gradient blur-3xl opacity-40 rounded-full animate-blob1" />
+              <div className="relative w-24 h-24 rounded-3xl arabgram-gradient p-[2px]">
+                <div className="w-full h-full bg-zinc-950 rounded-[22px] flex items-center justify-center overflow-hidden">
+                  <Image src="/arabgram-logo.png" alt="ArabGram" width={80} height={80} className="object-contain" priority />
                 </div>
               </div>
             </div>
           </div>
-          <h1 className="text-5xl font-black arabgram-text-gradient mb-3 tracking-tighter">ArabGram</h1>
-          <p className="text-slate-500 font-medium tracking-wide uppercase text-xs">Premium Social Experience</p>
+          <h1 className="text-6xl font-black arabgram-text-gradient tracking-tighter mb-3">ArabGram</h1>
+          <p className="text-zinc-600 font-bold text-xs uppercase tracking-[0.4em]">الكون الرقمي العربي</p>
         </div>
 
         {/* Card */}
-        <div className="glass-card p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">مرحباً بعودتك!</h2>
-            <p className="text-slate-500 text-sm">سجّل دخولك للبدء في استكشاف عالمك</p>
-          </div>
+        <div className="glass-panel rounded-[2.5rem] p-10 border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)]">
+          <h2 className="text-4xl font-black text-white mb-2 tracking-tight">ادخل عالمك.</h2>
+          <p className="text-zinc-500 font-bold mb-10 tracking-wide">لديك أثر هنا. سجّل دخولك.</p>
 
-
-
-          <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 mr-1">البريد الإلكتروني</label>
-              <div className="relative group">
-                <Mail className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-brand-primary transition-colors" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="arabgram-input pr-12 text-right placeholder:text-slate-400"
-                  placeholder="example@email.com"
-                  required
-                  autoComplete="email"
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-black text-zinc-500 uppercase tracking-widest mb-3">البريد الإلكتروني</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-transparent border-b-2 border-white/10 text-white text-xl font-bold py-4 placeholder:text-zinc-700 outline-none focus:border-white transition-colors"
+                placeholder="example@email.com"
+                required
+              />
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-sm font-bold text-slate-700">كلمة المرور</label>
-                <Link href="#" className="text-xs font-bold text-brand-primary hover:text-brand-secondary transition-colors">نسيت كلمة المرور؟</Link>
+            {/* Password */}
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <label className="text-xs font-black text-zinc-500 uppercase tracking-widest">كلمة المرور</label>
+                <Link href="#" className="text-xs font-bold arabgram-text-gradient">نسيت؟</Link>
               </div>
-              <div className="relative group">
-                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-brand-primary transition-colors" />
+              <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="arabgram-input pr-12 pl-12 text-right placeholder:text-slate-400"
+                  className="w-full bg-transparent border-b-2 border-white/10 text-white text-xl font-bold py-4 placeholder:text-zinc-700 outline-none focus:border-white transition-colors pr-0 pl-10"
                   placeholder="••••••••"
                   required
-                  autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-arabgram flex items-center justify-center gap-3 mt-8 h-14 text-lg group disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                <>
-                  <span className="font-black">دخول سريع</span>
-                  <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
-                </>
-              )}
-            </button>
+            {/* Submit */}
+            <div className="pt-6">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-16 rounded-full arabgram-gradient text-white font-black text-xl tracking-wide shadow-[0_0_30px_rgba(220,20,90,0.3)] hover:shadow-[0_0_50px_rgba(220,20,90,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+              >
+                {loading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  <span>دخول ←</span>
+                )}
+              </button>
+            </div>
           </form>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase tracking-widest">
-              <span className="px-4 bg-white text-slate-400 font-bold">أو المتابعة عبر</span>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <p className="text-slate-500 font-medium">
-              ليس لديك حساب حتى الآن؟{' '}
-              <Link
-                href="/auth/signup"
-                className="text-brand-primary hover:text-brand-secondary font-black transition-all hover:underline underline-offset-4"
-              >
-                انضم إلينا الآن
+          <div className="mt-10 text-center">
+            <p className="text-zinc-600 font-bold">
+              ليس لديك هوية رقمية بعد؟{' '}
+              <Link href="/auth/signup" className="arabgram-text-gradient font-black hover:opacity-80 transition-opacity">
+                أنشئها الآن
               </Link>
             </p>
           </div>
         </div>
 
-        <div className="flex justify-center mt-8">
-          <div className="security-badge px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl flex items-center gap-2">
-            <Shield className="h-4 w-4 text-emerald-400" />
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Secure Enterprise Encryption</span>
-          </div>
-        </div>
-
-        <p className="text-center text-slate-400 text-[10px] mt-8 font-bold uppercase tracking-[0.3em]">
+        <p className="text-center text-zinc-700 text-[10px] mt-8 font-bold uppercase tracking-[0.4em]">
           © 2026 ArabGram — Engineered by Eng. Anwar
         </p>
       </div>

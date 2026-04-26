@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Eye, EyeOff, Mail, Lock, User, AtSign, ArrowRight, ArrowLeft, Shield, Check, Loader2, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, AtSign, Shield, Check, Loader2 } from 'lucide-react'
 import { z } from 'zod'
 import toast from 'react-hot-toast'
 
@@ -26,11 +26,11 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 const steps = [
-  { id: 1, title: 'البريد الإلكتروني', icon: Mail, field: 'email' as keyof FormData },
-  { id: 2, title: 'الاسم الكامل', icon: User, field: 'name' as keyof FormData },
-  { id: 3, title: 'اسم المستخدم', icon: AtSign, field: 'username' as keyof FormData },
-  { id: 4, title: 'كلمة المرور', icon: Lock, field: 'password' as keyof FormData },
-  { id: 5, title: 'التحقق', icon: Shield, field: 'verification' as any },
+  { id: 1, title: 'بريدك', subtitle: 'كيف نصل إليك؟', icon: Mail, field: 'email' as keyof FormData },
+  { id: 2, title: 'اسمك', subtitle: 'ما الذي تريد أن يعرفك به الناس؟', icon: User, field: 'name' as keyof FormData },
+  { id: 3, title: 'هويتك', subtitle: 'ما الذي يميزك عن الآخرين؟', icon: AtSign, field: 'username' as keyof FormData },
+  { id: 4, title: 'سرّك', subtitle: 'كلمة مرور قوية لا يخترقها أحد', icon: Lock, field: 'password' as keyof FormData },
+  { id: 5, title: 'التحقق', subtitle: 'تأكيد هويتك الرقمية', icon: Shield, field: 'verification' as any },
 ]
 
 export default function Signup() {
@@ -47,15 +47,13 @@ export default function Signup() {
   const [verificationCode, setVerificationCode] = useState('')
   const [sentCode, setSentCode] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [serverError, setServerError] = useState('')
-  const [resendCountdown, setResendCountdown] = useState(0)
 
   const currentStep = steps[step - 1]
 
   const validateStep = () => {
     const field = currentStep.field as any
     if (field === 'verification') return true
-    
+
     const partial = { [field]: (formData as any)[field] }
     const partialSchema = schema.pick({ [field]: true } as any)
     const result = partialSchema.safeParse(partial)
@@ -76,8 +74,6 @@ export default function Signup() {
     if (step === 4) {
       if (!validateStep()) return
       setLoading(true)
-      setServerError('')
-
       try {
         const res = await fetch('/api/auth/send-verification', {
           method: 'POST',
@@ -95,16 +91,6 @@ export default function Signup() {
           setSentCode(data.maskedEmail || formData.email)
           toast.success('تم إرسال رمز التحقق لبريدك')
           setStep(5)
-          setResendCountdown(60)
-          const interval = setInterval(() => {
-            setResendCountdown(prev => {
-              if (prev <= 1) {
-                clearInterval(interval)
-                return 0
-              }
-              return prev - 1
-            })
-          }, 1000)
         } else {
           const err = await res.json()
           toast.error(err.message || 'حدث خطأ في إرسال الرمز')
@@ -123,7 +109,6 @@ export default function Signup() {
     if (step > 1) {
       setStep(step - 1)
       setErrors({})
-      setServerError('')
     }
   }
 
@@ -132,10 +117,7 @@ export default function Signup() {
       setErrors({ verification: 'الرمز يجب أن يكون 6 أرقام' })
       return
     }
-
     setLoading(true)
-    setServerError('')
-
     try {
       const res = await fetch('/api/auth/verify-email', {
         method: 'POST',
@@ -160,237 +142,201 @@ export default function Signup() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden" dir="rtl">
-      {/* Dynamic Background Elements */}
-      <div className="bg-blob w-[500px] h-[500px] bg-brand-primary top-[-10%] left-[-10%]" />
-      <div className="bg-blob w-[400px] h-[400px] bg-brand-secondary bottom-[-10%] right-[-10%] delay-700" />
+  const progressPct = ((step - 1) / (steps.length - 1)) * 100
 
-      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
-        {/* Logo Section */}
+  return (
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden" dir="rtl">
+
+      {/* Liquid Background Blobs */}
+      <div className="absolute top-[10%] left-[20%] w-[40vw] h-[40vw] bg-[#fa9628] rounded-full mix-blend-screen filter blur-[150px] opacity-10 animate-blob1 pointer-events-none" />
+      <div className="absolute bottom-[20%] right-[10%] w-[30vw] h-[30vw] bg-[#2850e6] rounded-full mix-blend-screen filter blur-[120px] opacity-10 animate-blob2 pointer-events-none" />
+      <div className="absolute top-[50%] right-[30%] w-[25vw] h-[25vw] bg-[#dc145a] rounded-full mix-blend-screen filter blur-[130px] opacity-10 pointer-events-none" />
+
+      {/* Grid overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+
+      <div className="w-full max-w-lg relative z-10">
+
+        {/* Logo */}
         <div className="text-center mb-10">
           <div className="flex justify-center mb-6">
-            <div className="relative group">
-              <div className="absolute inset-0 arabgram-gradient blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500 animate-pulse-soft" />
-              <div className="relative overflow-hidden rounded-[3.5rem] p-[4px] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-                <div className="absolute inset-0 arabgram-gradient animate-spin-slow" />
-                <div className="relative bg-white rounded-[3.3rem] p-4 shadow-xl">
-                  <Image
-                    src="/arabgram-logo.png"
-                    alt="ArabGram"
-                    width={180}
-                    height={180}
-                    className="rounded-3xl object-contain"
-                    priority
-                  />
+            <div className="relative">
+              <div className="absolute inset-0 arabgram-gradient blur-3xl opacity-40 rounded-full animate-blob1" />
+              <div className="relative w-20 h-20 rounded-3xl arabgram-gradient p-[2px]">
+                <div className="w-full h-full bg-zinc-950 rounded-[22px] flex items-center justify-center overflow-hidden">
+                  <Image src="/arabgram-logo.png" alt="ArabGram" width={64} height={64} className="object-contain" priority />
                 </div>
               </div>
             </div>
           </div>
-          <h1 className="text-4xl font-black arabgram-text-gradient mb-2 tracking-tighter">انضم إلى ArabGram</h1>
-          <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">ابدأ رحلتك الاجتماعية اليوم</p>
+          <h1 className="text-5xl font-black arabgram-text-gradient tracking-tighter mb-2">ArabGram</h1>
+          <p className="text-zinc-600 font-bold text-xs uppercase tracking-[0.4em]">ابنِ هويتك الرقمية</p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {steps.map((s, i) => (
-            <div key={s.id} className="flex items-center">
-              <div
-                className={`w-10 h-10 rounded-2xl flex items-center justify-center text-sm font-black transition-all duration-500 ${
-                  s.id < step
-                    ? 'arabgram-gradient text-white shadow-lg'
-                    : s.id === step
-                    ? 'bg-brand-primary/10 border-2 border-brand-primary text-brand-primary shadow-sm'
-                    : 'bg-white border border-slate-200 text-slate-400'
-                }`}
-              >
-                {s.id < step ? <Check className="h-5 w-5" /> : s.id}
-              </div>
-              {i < steps.length - 1 && (
-                <div className={`w-4 h-[2px] mx-1 rounded-full ${s.id < step ? 'arabgram-gradient' : 'bg-slate-200'}`} />
-              )}
-            </div>
-          ))}
+        {/* Progress Bar (not dots, a real bar) */}
+        <div className="mb-10 px-2">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-xs font-black text-zinc-600 uppercase tracking-widest">الخطوة {step} من {steps.length}</span>
+            <span className="text-xs font-black arabgram-text-gradient">{Math.round(progressPct)}%</span>
+          </div>
+          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+            <div
+              className="h-full arabgram-gradient rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(220,20,90,0.5)]"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
         </div>
 
         {/* Card */}
-        <div className="glass-card p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="glass-panel rounded-[2.5rem] p-10 border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.8)]">
+
           {step !== 5 && (
-            <div className="mb-8">
-              <div className="flex items-center gap-4 mb-3">
-                <div className="w-14 h-14 rounded-2xl arabgram-gradient flex items-center justify-center shadow-xl">
-                  <currentStep.icon className="h-7 w-7 text-white" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black text-brand-primary uppercase tracking-widest">الخطوة {step} من {steps.length}</p>
-                  <h2 className="text-2xl font-bold text-slate-900">{currentStep.title}</h2>
-                </div>
-              </div>
+            <div className="mb-10">
+              <h2 className="text-5xl font-black text-white tracking-tight mb-2">{currentStep.title}.</h2>
+              <p className="text-zinc-500 font-bold text-lg">{currentStep.subtitle}</p>
             </div>
           )}
 
-
-
-          <div className="space-y-6">
+          <div className="space-y-8">
             {step === 1 && (
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 mr-1">البريد الإلكتروني</label>
-                <div className="relative group">
-                  <Mail className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-brand-primary transition-colors" />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="arabgram-input pr-12 text-right"
-                    placeholder="example@email.com"
-                    onKeyDown={(e) => e.key === 'Enter' && nextStep()}
-                  />
-                </div>
-                {errors.email && <p className="text-red-400 text-xs mt-1 font-bold">{errors.email}</p>}
+              <div>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full bg-transparent border-b-2 border-white/10 text-white text-2xl font-bold py-4 placeholder:text-zinc-700 outline-none focus:border-white transition-colors"
+                  placeholder="example@email.com"
+                  onKeyDown={(e) => e.key === 'Enter' && nextStep()}
+                  autoFocus
+                />
+                {errors.email && <p className="text-red-400 text-sm font-bold mt-2">{errors.email}</p>}
               </div>
             )}
 
             {step === 2 && (
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 mr-1">الاسم الكامل</label>
-                <div className="relative group">
-                  <User className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-brand-primary transition-colors" />
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="arabgram-input pr-12 text-right"
-                    placeholder="أدخل اسمك الحقيقي"
-                    onKeyDown={(e) => e.key === 'Enter' && nextStep()}
-                  />
-                </div>
-                {errors.name && <p className="text-red-400 text-xs mt-1 font-bold">{errors.name}</p>}
+              <div>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full bg-transparent border-b-2 border-white/10 text-white text-2xl font-bold py-4 placeholder:text-zinc-700 outline-none focus:border-white transition-colors"
+                  placeholder="اسمك الكامل"
+                  onKeyDown={(e) => e.key === 'Enter' && nextStep()}
+                  autoFocus
+                />
+                {errors.name && <p className="text-red-400 text-sm font-bold mt-2">{errors.name}</p>}
               </div>
             )}
 
             {step === 3 && (
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 mr-1">اسم المستخدم</label>
-                <div className="relative group">
-                  <AtSign className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-brand-primary transition-colors" />
+              <div>
+                <div className="flex items-center border-b-2 border-white/10 focus-within:border-white transition-colors py-4">
+                  <span className="text-zinc-600 text-2xl font-black ml-2">@</span>
                   <input
                     type="text"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    className="arabgram-input pr-12 text-right"
+                    className="flex-1 bg-transparent text-white text-2xl font-bold placeholder:text-zinc-700 outline-none"
                     placeholder="username"
                     onKeyDown={(e) => e.key === 'Enter' && nextStep()}
+                    autoFocus
                   />
                 </div>
-                {errors.username && <p className="text-red-400 text-xs mt-1 font-bold">{errors.username}</p>}
+                {errors.username && <p className="text-red-400 text-sm font-bold mt-2">{errors.username}</p>}
               </div>
             )}
 
             {step === 4 && (
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-700 mr-1">كلمة المرور</label>
-                <div className="relative group">
-                  <Lock className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-brand-primary transition-colors" />
+              <div>
+                <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="arabgram-input pr-12 pl-12 text-right"
+                    className="w-full bg-transparent border-b-2 border-white/10 text-white text-2xl font-bold py-4 placeholder:text-zinc-700 outline-none focus:border-white transition-colors pl-10"
                     placeholder="••••••••"
                     onKeyDown={(e) => e.key === 'Enter' && nextStep()}
+                    autoFocus
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 transition-colors"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
                   </button>
                 </div>
-                {errors.password && <p className="text-red-400 text-xs mt-1 font-bold">{errors.password}</p>}
+                {errors.password && <p className="text-red-400 text-sm font-bold mt-2">{errors.password}</p>}
               </div>
             )}
 
             {step === 5 && (
-              <div className="text-center space-y-6">
-                <div className="w-20 h-20 rounded-3xl arabgram-gradient flex items-center justify-center mx-auto shadow-2xl animate-bounce">
-                  <Shield className="h-10 w-10 text-white" />
-                </div>
+              <div className="text-center space-y-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-2">تحقق من بريدك</h2>
-                  <p className="text-slate-500 text-sm">أرسلنا رمز التحقق إلى <span className="text-brand-primary font-bold">{sentCode}</span></p>
+                  <div className="w-20 h-20 arabgram-gradient rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(220,20,90,0.4)]">
+                    <Shield className="h-10 w-10 text-white" />
+                  </div>
+                  <h2 className="text-4xl font-black text-white mb-3">تحقق من هويتك.</h2>
+                  <p className="text-zinc-500 font-bold">أرسلنا الرمز إلى <span className="arabgram-text-gradient font-black">{sentCode}</span></p>
                 </div>
                 <input
                   type="text"
                   maxLength={6}
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full bg-white border-2 border-slate-200 rounded-2xl px-6 py-5 text-center text-3xl font-black tracking-[0.5em] text-brand-primary focus:border-brand-primary outline-none transition-all shadow-sm"
+                  className="w-full bg-transparent border-b-2 border-white/10 text-white text-4xl font-black tracking-[0.5em] text-center py-6 placeholder:text-zinc-700 outline-none focus:border-white transition-colors"
                   placeholder="000000"
                 />
                 {errors.verification && <p className="text-red-400 text-sm font-bold">{errors.verification}</p>}
-                
-                <div className="flex flex-col gap-4 pt-4">
-                  <button
-                    onClick={handleVerify}
-                    disabled={loading || verificationCode.length !== 6}
-                    className="btn-arabgram h-14 text-lg font-black disabled:opacity-50"
-                  >
-                    {loading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : 'تأكيد الرمز'}
-                  </button>
-                  <button
-                    onClick={() => setStep(1)}
-                    className="text-slate-500 hover:text-brand-primary font-bold text-sm transition-colors"
-                  >
-                    تغيير البريد الإلكتروني
-                  </button>
-                </div>
+                <button
+                  onClick={handleVerify}
+                  disabled={loading || verificationCode.length !== 6}
+                  className="w-full h-16 rounded-full arabgram-gradient text-white font-black text-xl shadow-[0_0_30px_rgba(220,20,90,0.3)] hover:shadow-[0_0_50px_rgba(220,20,90,0.5)] transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : 'تأكيد الهوية ✓'}
+                </button>
+                <button onClick={() => setStep(1)} className="text-zinc-600 hover:text-white font-bold text-sm transition-colors">
+                  تغيير البريد الإلكتروني
+                </button>
               </div>
             )}
 
             {step < 5 && (
-              <div className="flex gap-4 pt-6">
+              <div className="flex gap-4 pt-4">
                 {step > 1 && (
                   <button
                     onClick={prevStep}
-                    className="flex-1 h-14 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all flex items-center justify-center gap-2 shadow-sm"
+                    className="px-8 h-16 rounded-full glass-panel border border-white/10 text-white font-black hover:bg-white/10 transition-all"
                   >
-                    <ArrowLeft className="h-5 w-5" />
-                    <span>السابق</span>
+                    →
                   </button>
                 )}
                 <button
                   onClick={nextStep}
                   disabled={loading}
-                  className="flex-[2] btn-arabgram h-14 text-lg font-black flex items-center justify-center gap-2 group"
+                  className="flex-1 h-16 rounded-full arabgram-gradient text-white font-black text-xl shadow-[0_0_30px_rgba(220,20,90,0.3)] hover:shadow-[0_0_50px_rgba(220,20,90,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
                 >
                   {loading ? (
                     <Loader2 className="h-6 w-6 animate-spin" />
                   ) : (
-                    <>
-                      <span>{step === 4 ? 'إنشاء الحساب' : 'المتابعة'}</span>
-                      <ArrowRight className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                    </>
+                    <span>{step === 4 ? 'إنشاء الهوية ✦' : 'التالي ←'}</span>
                   )}
                 </button>
               </div>
             )}
           </div>
 
-          <div className="text-center mt-10">
-            <p className="text-slate-500 font-medium">
-              لديك حساب بالفعل؟{' '}
-              <Link
-                href="/auth/signin"
-                className="text-brand-primary hover:text-brand-secondary font-black transition-all hover:underline underline-offset-4"
-              >
-                سجل دخولك الآن
+          <div className="mt-10 text-center">
+            <p className="text-zinc-600 font-bold">
+              لديك هوية بالفعل؟{' '}
+              <Link href="/auth/signin" className="arabgram-text-gradient font-black hover:opacity-80 transition-opacity">
+                ادخل عالمك
               </Link>
             </p>
           </div>
         </div>
 
-        <p className="text-center text-slate-400 text-[10px] mt-8 font-bold uppercase tracking-[0.3em]">
+        <p className="text-center text-zinc-700 text-[10px] mt-8 font-bold uppercase tracking-[0.4em]">
           © 2026 ArabGram — Engineered by Eng. Anwar
         </p>
       </div>
