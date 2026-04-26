@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Home, Compass, PlusSquare, MessageCircle, Bell, User, LogOut } from 'lucide-react'
+import { Home, Compass, PlusSquare, MessageCircle, Bell, User, LogOut, Search, Heart, Video } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase, CHANNELS } from '@/lib/supabase'
 
 export default function Navigation() {
@@ -45,99 +45,98 @@ export default function Navigation() {
 
   const navItems = [
     { href: '/feed', icon: Home, label: 'الرئيسية', badge: 0 },
-    { href: '/search', icon: Compass, label: 'استكشاف', badge: 0 },
-    { href: '/stories', icon: PlusSquare, label: 'قصة جديدة', badge: 0 },
+    { href: '/search', icon: Search, label: 'بحث', badge: 0 },
+    { href: '/explore', icon: Compass, label: 'استكشاف', badge: 0 },
+    { href: '/reels', icon: Video, label: 'Reels', badge: 0 },
     { href: '/messages', icon: MessageCircle, label: 'الرسائل', badge: 0 },
-    { href: '/notifications', icon: Bell, label: 'الإشعارات', badge: unreadNotifs },
+    { href: '/notifications', icon: Heart, label: 'الإشعارات', badge: unreadNotifs },
+    { href: '/stories/new', icon: PlusSquare, label: 'إنشاء', badge: 0 },
     { href: profileUsername ? `/profile/${profileUsername}` : '/feed', icon: User, label: 'الملف الشخصي', badge: 0 },
+  ]
+
+  const mobileNavItems = [
+    { href: '/feed', icon: Home },
+    { href: '/search', icon: Search },
+    { href: '/stories/new', icon: PlusSquare },
+    { href: '/reels', icon: Video },
+    { href: profileUsername ? `/profile/${profileUsername}` : '/feed', icon: User },
   ]
 
   return (
     <>
-      {/* Top Glass Navbar for Desktop & Mobile */}
-      <nav className="fixed top-0 left-0 right-0 h-20 bg-black/50 backdrop-blur-2xl border-b border-white/5 z-50 flex items-center justify-between px-6 transition-all duration-300">
-        <div className="flex items-center gap-8">
-          <Link href="/feed" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-400 p-[1px] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-all duration-500">
-               <div className="w-full h-full bg-black/90 rounded-[15px] flex items-center justify-center backdrop-blur-xl">
-                 <Image src="/arabgram-logo.png" alt="ArabGram" width={32} height={32} className="object-contain" />
-               </div>
-            </div>
-            <span className="font-black text-2xl tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-cyan-400 transition-all duration-300 hidden sm:block">
-              ArabGram
-            </span>
-          </Link>
+      {/* Desktop Sidebar (RTL means it's on the right) */}
+      <aside className="hidden md:flex flex-col fixed right-0 top-0 bottom-0 w-64 border-l border-slate-200 bg-white z-50 py-8 px-4">
+        <Link href="/feed" className="flex items-center gap-4 mb-10 px-2">
+          <Image src="/arabgram-logo.png" alt="ArabGram" width={32} height={32} className="object-contain" />
+          <span className="text-xl font-bold font-serif italic tracking-wide">ArabGram</span>
+        </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-2">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300 relative group ${
-                    isActive ? 'text-white bg-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <div className="relative">
-                    <item.icon className={`h-5 w-5 transition-transform duration-300 ${isActive ? 'scale-110 text-cyan-400' : 'group-hover:scale-110'}`} />
-                    {item.badge > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] bg-indigo-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-sm animate-bounce">
-                        {item.badge > 9 ? '9+' : item.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-sm font-semibold">{item.label}</span>
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {/* Mobile specific quick actions */}
-          <div className="md:hidden flex items-center gap-2">
-            <Link href="/notifications" className="relative p-2 text-zinc-400 hover:text-white">
-              <Bell className="h-6 w-6" />
-              {unreadNotifs > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-indigo-500 rounded-full animate-pulse" />
-              )}
-            </Link>
-            <Link href="/messages" className="relative p-2 text-zinc-400 hover:text-white">
-              <MessageCircle className="h-6 w-6" />
-            </Link>
-          </div>
-
-          <button
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 group"
-          >
-            <span className="text-sm font-semibold">خروج</span>
-            <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile Floating Bottom Bar */}
-      <div className="md:hidden fixed bottom-6 left-4 right-4 z-50 pointer-events-none">
-        <div className="bg-black/60 backdrop-blur-2xl border border-white/10 pointer-events-auto rounded-[2rem] p-2 flex items-center justify-between shadow-2xl">
-          {navItems.filter(i => !['/messages', '/notifications'].includes(i.href)).map((item) => {
+        <div className="flex-1 flex flex-col gap-1">
+          {navItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`p-3 rounded-2xl transition-all duration-300 flex items-center justify-center relative ${
-                  isActive ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
+                className={`flex items-center gap-4 p-3 rounded-lg transition-colors group relative ${
+                  isActive ? 'font-bold' : 'hover:bg-slate-50'
                 }`}
               >
-                {isActive && <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-100" />}
-                <item.icon className={`h-6 w-6 relative z-10 ${isActive ? 'text-cyan-400' : ''}`} />
+                <div className="relative">
+                  <item.icon className={`h-6 w-6 transition-transform group-hover:scale-105 ${isActive ? 'stroke-[2.5px]' : 'stroke-2 text-slate-900'}`} />
+                  {item.badge > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-white">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[15px]">{item.label}</span>
               </Link>
             )
           })}
         </div>
+
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="flex items-center gap-4 p-3 rounded-lg text-slate-900 hover:bg-slate-50 transition-colors mt-auto group"
+        >
+          <LogOut className="h-6 w-6 stroke-2 group-hover:scale-105 transition-transform" />
+          <span className="text-[15px]">تسجيل الخروج</span>
+        </button>
+      </aside>
+
+      {/* Mobile Top Navbar (Logo & Actions) */}
+      <nav className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-slate-200 z-50 flex items-center justify-between px-4">
+        <Link href="/feed" className="flex items-center gap-2">
+          <span className="font-bold font-serif italic text-xl">ArabGram</span>
+        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/notifications" className="relative text-slate-900">
+            <Heart className="h-6 w-6 stroke-2" />
+            {unreadNotifs > 0 && (
+              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full" />
+            )}
+          </Link>
+          <Link href="/messages" className="relative text-slate-900">
+            <MessageCircle className="h-6 w-6 stroke-2" />
+          </Link>
+        </div>
+      </nav>
+
+      {/* Mobile Bottom Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-12 bg-white border-t border-slate-200 z-50 flex items-center justify-around px-2 pb-safe">
+        {mobileNavItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="p-2 transition-transform active:scale-95"
+            >
+              <item.icon className={`h-6 w-6 ${isActive ? 'stroke-[2.5px] text-slate-900' : 'stroke-2 text-slate-900'}`} />
+            </Link>
+          )
+        })}
       </div>
     </>
   )
