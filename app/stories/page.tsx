@@ -1,9 +1,8 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import Link from 'next/link'
 import Image from 'next/image'
-import { Clock, Plus, Eye, Trash2, Share2 } from 'lucide-react'
+import { Clock, Plus, Eye, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 interface Story {
@@ -17,7 +16,6 @@ interface Story {
   views: number
   imageUrl: string
 }
-
 
 export default function Stories() {
   const { data: session } = useSession()
@@ -36,7 +34,7 @@ export default function Stories() {
         const data = await res.json()
         setStories(data.map((s: any) => ({
           ...s,
-          views: Math.floor(Math.random() * 500) + 10, // Mock views as they are not in DB
+          views: Math.floor(Math.random() * 500) + 10,
         })))
       }
     } catch (err) {
@@ -46,180 +44,167 @@ export default function Stories() {
     }
   }
 
-  const deleteStory = (id: string) => {
-    setStories(stories.filter(s => s.id !== id))
-  }
-
   return (
-    <div className="min-h-screen bg-slate-50 pt-20 pb-8" dir="rtl">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-12">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 arabgram-gradient rounded-2xl flex items-center justify-center">
-              <Clock className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-black arabgram-text-gradient">القصص</h1>
-              <p className="text-slate-500 text-sm mt-1">تختفي بعد 24 ساعة</p>
-            </div>
-          </div>
+    <div className="min-h-screen w-full px-6 py-12 md:py-20 relative z-10 pb-32" dir="rtl">
+      <div className="max-w-[1400px] mx-auto">
 
+        {/* Avant-Garde Header */}
+        <div className="flex items-end justify-between mb-16">
+          <div>
+            <h1 className="text-7xl md:text-9xl font-black text-white/5 tracking-tighter select-none uppercase">اللحظات.</h1>
+            <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm -mt-4 md:-mt-8">تختفي بعد 24 ساعة · {stories.length} قصة نشطة</p>
+          </div>
           {session && (
-            <button className="flex items-center gap-2 px-6 py-3 btn-arabgram rounded-2xl font-semibold">
-              <Plus className="h-5 w-5" />
-              <span>إضافة قصة</span>
+            <button className="flex items-center gap-3 px-8 py-4 rounded-full arabgram-gradient text-white font-black text-lg shadow-[0_0_30px_rgba(220,20,90,0.3)] hover:shadow-[0_0_50px_rgba(220,20,90,0.5)] transition-all hover:scale-105 shrink-0">
+              <Plus className="h-6 w-6" />
+              <span>أضف لحظة</span>
             </button>
           )}
         </div>
 
-        {/* Stories Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-          {stories.map((story) => (
-            <div
-              key={story.id}
-              className="group cursor-pointer"
-              onClick={() => setSelectedStory(story)}
-            >
-              <div className="relative overflow-hidden rounded-3xl aspect-[9/16] bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                {/* Background Image */}
-                <Image
-                  src={story.imageUrl}
-                  alt={story.user.name || 'Story'}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/70 transition-all duration-300" />
-
-                {/* Story Ring */}
-                <div className="absolute top-3 right-3 story-ring p-0.5">
-                  <Image
-                    src={story.user.image || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'}
-                    alt={story.user.name}
-                    width={32}
-                    height={32}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                </div>
-
-                {/* Info */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-                  <p className="text-white font-bold text-sm line-clamp-1">{story.user.name}</p>
-                  <div className="flex items-center gap-1 text-gray-300 text-xs mt-1">
-                    <Clock className="h-3 w-3" />
-                    <span>{story.expiresAt}</span>
-                  </div>
-                </div>
-
-                {/* Hover Actions */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
-                  <div className="flex gap-3">
-                    <button className="p-2 bg-white/20 hover:bg-white/30 rounded-full text-white transition-all duration-200">
-                      <Eye className="h-5 w-5" />
-                    </button>
-                    <button className="p-2 bg-white/20 hover:bg-white/30 rounded-full text-white transition-all duration-200">
-                      <Share2 className="h-5 w-5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Views Badge */}
-                <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-lg text-white text-xs font-semibold flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
-                  <span>{story.views}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Add Story Card */}
-          {session && (
-            <div className="group cursor-pointer">
-              <div className="relative overflow-hidden rounded-3xl aspect-[9/16] bg-brand-primary/5 border-2 border-dashed border-brand-primary/30 hover:border-brand-primary transition-all duration-300 flex items-center justify-center hover:-translate-y-2">
-                <div className="text-center">
-                  <div className="w-12 h-12 arabgram-gradient rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-lg">
-                    <Plus className="h-6 w-6 text-white" />
-                  </div>
-                  <p className="text-brand-primary font-bold text-sm">إضافة قصة</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Story Viewer Modal */}
-        {selectedStory && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-            onClick={() => setSelectedStory(null)}
-          >
-            <div
-              className="relative w-full max-w-sm h-screen max-h-[90vh] rounded-3xl overflow-hidden bg-black shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close Button */}
-              <button
-                onClick={() => setSelectedStory(null)}
-                className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-all duration-200"
+        {loading ? (
+          <div className="flex items-center justify-center py-32">
+            <Loader2 className="h-12 w-12 text-white animate-spin opacity-20" />
+          </div>
+        ) : stories.length === 0 ? (
+          <div className="text-center py-32">
+            <h2 className="text-5xl font-black text-zinc-700">لا لحظات هنا بعد.</h2>
+            <p className="text-zinc-600 mt-4 font-bold">كن أول من يترك أثراً.</p>
+          </div>
+        ) : (
+          /* Cinematic Stories Grid */
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
+            {stories.map((story, i) => (
+              <div
+                key={story.id}
+                className="group cursor-pointer"
+                onClick={() => setSelectedStory(story)}
               >
-                ✕
-              </button>
-
-              {/* Story Image */}
-              <Image
-                src={selectedStory.imageUrl}
-                alt={selectedStory.user.name || 'Story'}
-                fill
-                className="object-cover"
-              />
-
-              {/* Story Info */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent z-10">
-                <div className="flex items-center gap-3">
+                <div
+                  className="relative overflow-hidden rounded-[2rem] bg-zinc-900 border border-white/5 hover:border-white/20 transition-all duration-500 hover:scale-105 hover:shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+                  style={{ aspectRatio: '9/16' }}
+                >
                   <Image
-                    src={selectedStory.user.image || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'}
-                    alt={selectedStory.user.name}
-                    width={40}
-                    height={40}
-                    className="w-10 h-10 rounded-full object-cover"
+                    src={story.imageUrl}
+                    alt={story.user.name || 'Story'}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="flex-1">
-                    <p className="text-white font-bold">{selectedStory.user.name}</p>
-                    <p className="text-gray-400 text-sm">@{selectedStory.user.username}</p>
+
+                  {/* Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/10 to-transparent" />
+
+                  {/* Top: Views */}
+                  <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-panel border border-white/10 text-white text-xs font-black">
+                    <Eye className="h-3 w-3" />
+                    <span>{story.views}</span>
                   </div>
-                  <div className="text-right">
-                    <div className="text-white font-bold flex items-center gap-1">
-                      <Eye className="h-4 w-4" />
-                      <span>{selectedStory.views}</span>
+
+                  {/* Bottom: User Info */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/20 shrink-0">
+                        {story.user.image ? (
+                          <img src={story.user.image} alt={story.user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full arabgram-gradient flex items-center justify-center">
+                            <span className="text-white text-xs font-black">{story.user.name?.[0]}</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-white font-black text-sm line-clamp-1">{story.user.name}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-zinc-400 text-[11px] font-bold">
+                      <Clock className="h-3 w-3" />
+                      <span>{story.expiresAt}</span>
                     </div>
                   </div>
                 </div>
               </div>
+            ))}
 
-              {/* Navigation */}
-              <div className="absolute top-1/2 left-4 right-4 flex justify-between pointer-events-none z-10">
-                <button className="pointer-events-auto p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-200">
-                  ←
-                </button>
-                <button className="pointer-events-auto p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-200">
-                  →
-                </button>
+            {/* Add Story Card */}
+            {session && (
+              <div className="group cursor-pointer">
+                <div
+                  className="relative overflow-hidden rounded-[2rem] border-2 border-dashed border-white/10 hover:border-white/30 transition-all duration-500 hover:scale-105 flex items-center justify-center"
+                  style={{ aspectRatio: '9/16' }}
+                >
+                  <div className="text-center">
+                    <div className="w-14 h-14 arabgram-gradient rounded-full flex items-center justify-center mx-auto mb-3 shadow-[0_0_20px_rgba(220,20,90,0.3)]">
+                      <Plus className="h-7 w-7 text-white" />
+                    </div>
+                    <p className="arabgram-text-gradient font-black text-sm">لحظة جديدة</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {stories.length === 0 && (
-          <div className="text-center py-20">
-            <Clock className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-slate-500 mb-2">لا توجد قصص حالياً</h2>
-            <p className="text-slate-400">ابدأ بإضافة قصة جديدة لمشاركة لحظاتك</p>
+            )}
           </div>
         )}
       </div>
+
+      {/* Cinematic Story Viewer Modal */}
+      {selectedStory && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/95 backdrop-blur-xl"
+          onClick={() => setSelectedStory(null)}
+        >
+          <div
+            className="relative w-full max-w-sm rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.9)]"
+            style={{ aspectRatio: '9/16', maxHeight: '90vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Story Image */}
+            <Image
+              src={selectedStory.imageUrl}
+              alt={selectedStory.user.name || 'Story'}
+              fill
+              className="object-cover"
+            />
+
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-zinc-950/50" />
+
+            {/* Close */}
+            <button
+              onClick={() => setSelectedStory(null)}
+              className="absolute top-6 left-6 z-10 w-12 h-12 glass-panel rounded-full flex items-center justify-center text-white border border-white/20 text-2xl hover:scale-110 transition-transform"
+            >
+              ✕
+            </button>
+
+            {/* Story User Info */}
+            <div className="absolute top-6 right-6 z-10 flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
+                {selectedStory.user.image ? (
+                  <img src={selectedStory.user.image} alt={selectedStory.user.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full arabgram-gradient flex items-center justify-center">
+                    <span className="text-white font-black">{selectedStory.user.name?.[0]}</span>
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-white font-black">{selectedStory.user.name}</p>
+                <p className="text-zinc-400 text-sm">@{selectedStory.user.username}</p>
+              </div>
+            </div>
+
+            {/* Bottom stats */}
+            <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-2 text-white z-10">
+              <Eye className="h-5 w-5 opacity-60" />
+              <span className="font-black text-xl">{selectedStory.views}</span>
+              <span className="text-zinc-400 text-sm font-bold">مشاهدة</span>
+            </div>
+
+            {/* Navigation */}
+            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 pointer-events-none z-10">
+              <button className="pointer-events-auto w-12 h-12 glass-panel rounded-full flex items-center justify-center text-white text-xl border border-white/10 hover:scale-110 transition-transform">←</button>
+              <button className="pointer-events-auto w-12 h-12 glass-panel rounded-full flex items-center justify-center text-white text-xl border border-white/10 hover:scale-110 transition-transform">→</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
